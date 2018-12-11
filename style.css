@@ -1,0 +1,39 @@
+html *
+{
+	font-family: Helvetica
+}
+
+body {
+	background-color: #ebd7ba
+}
+
+ul {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+	background-color: #63ab5b;
+	position: fixed;
+	width: 100%;
+	height: 30pt;
+}
+
+li {
+	float: right;
+	height: 100%;
+}
+
+li a {
+	display: block;
+	color: #ffffff;
+	text-decoration: none;
+	text-align: center;
+	padding: 8pt 10pt;
+}
+
+li a.active {
+	background-color: #82bb7b;
+}
+
+li a:hover:not(.active) {
+	background-color: #82bb7b
+}
