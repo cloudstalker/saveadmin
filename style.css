@@ -1,6 +1,7 @@
+/* Global styles */
 html *
 {
-	font-family: HelveticaNeue
+	font-family: 'Open Sans', sans-serif;
 }
 
 body {
@@ -9,14 +10,14 @@ body {
 	padding: 0;
 }
 
+/* Navigation Bar Styles */
 ul {
 	list-style-type: none;
 	margin: 0;
 	padding: 0;
 	background-color: #63ab5b;
-	position: fixed;
 	width: 100%;
-	height: 30pt;
+	height: 40pt;
 }
 
 li {
@@ -33,8 +34,8 @@ li p {
 	color: #ffffff;
 	text-align: center;
 	margin: 0;
-	padding: 8pt 20pt;
-	font-style: regular
+	padding: 12pt 20pt;
+	font-weight: 800
 }
 
 li a {
@@ -42,13 +43,32 @@ li a {
 	color: #ffffff;
 	text-decoration: none;
 	text-align: center;
-	padding: 8pt 10pt;
+	height: 100%;
+	box-sizing: border-box;
+	padding: 12pt 10pt;
+	font-weight: normal;
 }
 
 li a.active {
 	background-color: #82bb7b;
+	font-weight: 600;
 }
 
 li a:hover:not(.active) {
 	background-color: #82bb7b
+}
+
+/* Statistics Panel Styles */
+#statTitle{
+	background-color: #f3e7d5;
+	height: 30pt;
+	box-shadow: 0 0 23px #b09671;
+	position: relative;
+	z-index: -1;
+}
+
+#statTitle p {
+	margin: 0;
+	padding-left: 30pt;
+	padding-top: 5pt;
 }
