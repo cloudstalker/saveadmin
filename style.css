@@ -11,6 +11,36 @@ body {
 	font-size: 16px;
 }
 
+.darkGrayText {
+	color: #4A4A4A;
+}
+
+.whiteText {
+	color: #ffffff;
+}
+
+.button {
+	height: 2.25em;
+	width: 8em;
+	margin-right: 2em;
+	text-align: center;
+	border: none;
+	text-size: 75%;
+	border-radius: 1.125em;
+}
+
+.greenBg {
+	background-color: #63ab5b;
+}
+
+.blueBg {
+	background-color: #4A90E2;
+}
+
+.grayBg {
+	background-color: #9B9B9B;
+}
+
 /* Navigation Bar Styles */
 ul {
 	list-style-type: none;
@@ -18,7 +48,7 @@ ul {
 	padding: 0;
 	background-color: #63ab5b;
 	width: 100%;
-	height: 40pt;
+	height: 3em;
 }
 
 li {
@@ -32,21 +62,20 @@ li.navBarTitle {
 
 li p {
 	display: block;
-	color: #ffffff;
 	text-align: center;
 	margin: 0;
-	padding: 12pt 20pt;
-	font-weight: 800
+	padding: 0.5em 1em;
+	font-weight: 800;
+	font-size: 125%;
 }
 
-li a {
+li a.topLvl {
 	display: block;
-	color: #ffffff;
 	text-decoration: none;
 	text-align: center;
 	height: 100%;
 	box-sizing: border-box;
-	padding: 12pt 10pt;
+	padding: 1em 1em;
 	font-weight: normal;
 }
 
@@ -59,17 +88,96 @@ li a:hover:not(.active) {
 	background-color: #82bb7b
 }
 
-/* Statistics Panel Styles */
+.dropdownContent {
+  display: none;
+  position: relative;
+  background-color: #f1f1f1;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+.dropdownContent a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+.dropdownContent a:hover {background-color: #ddd;}
+
+.dropdown:hover .dropdownContent {display: block;}
+
+.dropdown:hover .topLvl {background-color: #3e8e41;}
+
+/* Statistics Panel Styles for index.html */
 #statTitle{
 	background-color: #f3e7d5;
-	height: 30pt;
+	height: 4em;
+	box-shadow: 0 0 23px #b09671;
+	position: relative;
+	z-index: -1;
+}
+#statTitle img {
+	float: left;
+	padding-left: 1em;
+	padding-top: 1.5em;
+	height: 1.5em;
+}
+
+#statTitle p {
+	margin: 0;
+	padding-left: 4em;
+	padding-top: 1.7em;
+	font-weight: 600;
+}
+
+/* Graph Section for index.html*/
+div.graphInstance{
+	box-shadow: 0 0 23px #b09671;
+	max-width: 600px;
+	margin:2em 4em;
+}
+
+div.graphTitle{
+	background-color: #4A4A4A;
+}
+
+div.graphTitle p{
+	text-align: center;
+	font-size: 80%;
+	padding: 0.5em 0em;
+	margin: 0;
+}
+
+div.graph{
+	background-color: #F6F0E6;
+}
+
+/* vendor.html layout */
+
+/* Vendor Panel for vendor.html */
+#vendorTitle{
+	background-color: #f3e7d5;
+	height: 6em;
 	box-shadow: 0 0 23px #b09671;
 	position: relative;
 	z-index: -1;
 }
 
-#statTitle p {
+#vendorTitle p.vendorHeader{
 	margin: 0;
-	padding-left: 30pt;
-	padding-top: 5pt;
+	padding-left: 3em;
+	padding-top: 1.5em;
+	float: left;
+}
+
+.vendorButton {
+	margin-top: 1.5em;
+	float: right
+}
+
+#columnTitles {
+	margin-top: 1em;
+	width: auto;
+	padding: 0 5%;
 }

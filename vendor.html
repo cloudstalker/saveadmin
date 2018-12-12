@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<head>
+		<title>Save Admin Tool</title>
+		<link rel="stylesheet" type="text/css" href="style.css">
+		<link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet"> 
+	</head>
+	<body>
+		<div id="pageContainer">
+			<ul>
+				<li class="navBarTitle"><p class="whiteText">Save Admin Tool</p></li>
+				<li><a href="settings.html" class="topLvl whiteText">Settings</a></li>
+				<li class="dropdown">
+					<a class="whiteText topLvl  active">Manage Accounts</a>
+					<div class="dropdownContent">
+						<a>Vendor Accounts</a>
+						<a>User Accounts</a>
+						<a>Admin Accounts</a>
+					</div>
+				</li>
+				<li><a href="index.html" class="topLvl whiteText">Dashboard</a></li>
+			</ul>
+			<div id="vendorTitle">
+				<div style="display: inline-block; width: 100%">
+					<p class="darkGrayText vendorHeader">Vendor Accounts</p>
+					<button class="vendorButton grayBg button whiteText">Notify</button>
+					<button class="vendorButton greenBg button whiteText">Upload</button>
+					<button class="vendorButton greenBg button whiteText">Download</button>
+					<button class="vendorButton blueBg button whiteText">Settle</button>
+				</div>
+				<div id="columnTitles">
+					
+				</div>
+			</div>
+		</div>
+	</body>
+	
+	<script src="https://www.gstatic.com/firebasejs/5.7.0/firebase.js"></script>
+	<script>
+		// Initialize Firebase
+		var config = {
+			apiKey: "AIzaSyD_8xDR6m1kA5Xg3YDmbbEsKdxM8HpP-44",
+			authDomain: "nussave-app.firebaseapp.com",
+			databaseURL: "https://nussave-app.firebaseio.com",
+			projectId: "nussave-app",
+			storageBucket: "nussave-app.appspot.com",
+			messagingSenderId: "770570652465"
+		};
+		firebase.initializeApp(config);
+
+		// Get a reference to the database service
+		var database = firebase.database();
+
+		// Creating column titles
+		const columnNumber = 8;
+		var divWidth = 100.0 / 8;
+		var columns = ["VendorID", "Name", "FoodcourtID", "Type", "Unsettled", "TotalRedeem", "Contact", "Password"];
+		var columnElements = [];
+		for (var i = 0; i < columnNumber; i++){
+			var division = document.createElement("DIV");
+			var para = document.createElement("P");
+			var t = document.createTextNode(columns[i]);
+			division.appendChild(para);
+			division.style.width = divWidth.toString() + "%";
+			division.style.display = "inline-block";
+			para.appendChild(t);
+			para.style.textAlign = "center";
+			para.style.fontSize = "75%";
+			para.style.margin = "0";
+			para.className = "darkGrayText";
+			document.getElementById("columnTitles").appendChild(division);
+		}
+
+	</script>
+</html>

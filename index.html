@@ -4,23 +4,78 @@
 	<head>
 		<title>Save Admin Tool</title>
 		<link rel="stylesheet" type="text/css" href="style.css">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.css">
 		<link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet"> 
 	</head>
 	<body>
 		<div id="pageContainer">
-			<div>
-				<ul>
-					<li class="navBarTitle"><p>Save Admin Tool</p></li>
-					<li><a href="settings.html">Settings</a></li>
-					<li><a href="accounts.html">Manage Accounts</a></li>
-					<li><a href="index.html" class="active">Dashboard</a></li>
-				</ul>
+			<ul>
+				<li class="navBarTitle"><p class="whiteText">Save Admin Tool</p></li>
+				<li><a href="settings.html" class="topLvl whiteText">Settings</a></li>
+				<li class="dropdown">
+					<a class="whiteText topLvl">Manage Accounts</a>
+					<div class="dropdownContent">
+						<a href="vendor.html">Vendor Accounts</a>
+						<a>User Accounts</a>
+						<a>Admin Accounts</a>
+					</div>
+				</li>
+				<li><a href="index.html" class="topLvl active whiteText">Dashboard</a></li>
+			</ul>
+
+			<div id="statTitle">
+				<img src="resources/icons/stat_icon.png"/>
+				<p class="darkGrayText">Statistics</p>
 			</div>
-			<div>
-				<div id="statTitle">
-					<p>Statistics</p>
+
+			<div class="graphInstance">
+				<div class="graphTitle">
+					<p class="whiteText">Weekly Sign In</p>
+				</div>
+				<div class="graph" id="firstGraph">
+
 				</div>
 			</div>
 		</div>
 	</body>
+	
+	<script src="https://www.gstatic.com/firebasejs/5.7.0/firebase.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js"></script>
+	<script>
+		// Initialize Firebase
+		var config = {
+			apiKey: "AIzaSyD_8xDR6m1kA5Xg3YDmbbEsKdxM8HpP-44",
+			authDomain: "nussave-app.firebaseapp.com",
+			databaseURL: "https://nussave-app.firebaseio.com",
+			projectId: "nussave-app",
+			storageBucket: "nussave-app.appspot.com",
+			messagingSenderId: "770570652465"
+		};
+		firebase.initializeApp(config);
+
+		// Get a reference to the database service
+		var database = firebase.database();
+
+		// Test
+		var dbref = firebase.database().ref('/Stalls/stall1');
+
+		// Drawing graphs
+		var graph1 = document.getElementById('firstGraph');
+		var items = [
+		{x: '2014-06-11', y: 10},
+		{x: '2014-06-12', y: 25},
+		{x: '2014-06-13', y: 30},
+		{x: '2014-06-14', y: 10},
+		{x: '2014-06-15', y: 15},
+		{x: '2014-06-16', y: 30}
+		];
+		var dataset = new vis.DataSet(items);
+		var options = {
+			start: '2014-06-10',
+			end: '2014-06-18',
+			drawPoints: {style: 'circle'},
+			shaded: {orientation: 'bottom'}
+		};
+		var graph2d = new vis.Graph2d(graph1, dataset, options);
+	</script>
 </html>
