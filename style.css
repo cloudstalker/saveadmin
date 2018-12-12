@@ -15,6 +15,10 @@ body {
 	color: #4A4A4A;
 }
 
+.lightGrayText {
+	color: #858585;
+}
+
 .whiteText {
 	color: #ffffff;
 }
@@ -166,6 +170,7 @@ div.graph{
 
 #vendorTitle p.vendorHeader{
 	margin: 0;
+	font-weight: 800;
 	padding-left: 3em;
 	padding-top: 1.5em;
 	float: left;
@@ -179,5 +184,6 @@ div.graph{
 #columnTitles {
 	margin-top: 1em;
 	width: auto;
-	padding: 0 5%;
+	margin-left: 3em;
+	margin-right: 10%;
 }
