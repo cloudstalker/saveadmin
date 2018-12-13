@@ -54,7 +54,7 @@
 
 		// Creating column titles
 		const columnNumber = 8;
-		var divWidth = 100.0 / 8;
+		var divWidth = 100.0 / (columnNumber - 1);
 		var columns = ["VendorID", "Name", "FoodcourtID", "Type", "Unsettled", "TotalRedeem", "Contact", "Password"];
 		var columnElements = [];
 		for (var i = 0; i < columnNumber; i++){
@@ -62,13 +62,13 @@
 			var para = document.createElement("P");
 			var t = document.createTextNode(columns[i]);
 			division.appendChild(para);
-			division.style.width = divWidth.toString() + "%";
 			division.style.display = "inline-block";
 			para.appendChild(t);
 			para.style.textAlign = "center";
 			para.style.fontSize = "75%";
 			para.style.fontWeight = "600";
-			para.style.margin = "0";
+			para.style.marginLeft = "2em";
+			para.style.marginRight = "2em";
 			para.className = "darkGrayText";
 			document.getElementById("columnTitles").appendChild(division);
 		}
