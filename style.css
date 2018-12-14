@@ -29,12 +29,18 @@ body {
 	margin-right: 2em;
 	text-align: center;
 	border: none;
-	text-size: 75%;
+	font-size: 75%;
 	border-radius: 1.125em;
+	transition-duration: 0.4s;
+	cursor: pointer;
 }
 
 .greenBg {
 	background-color: #63ab5b;
+}
+
+button.greenBg:hover {
+	background-color: #82bb7b;
 }
 
 .blueBg {
@@ -117,7 +123,7 @@ li a:hover:not(.active) {
 #statTitle{
 	background-color: #f3e7d5;
 	height: 4em;
-	box-shadow: 0 0 23px #b09671;
+	box-shadow: 0 3px 20px #b09671;
 	position: relative;
 	z-index: -1;
 }
@@ -160,12 +166,12 @@ div.graph{
 /* vendor.html layout */
 
 /* Vendor Panel for vendor.html */
+
 #vendorTitle{
 	background-color: #f3e7d5;
 	height: 6em;
-	box-shadow: 0 0 23px #b09671;
+	box-shadow: 0 3px 20px #b09671;
 	position: relative;
-	z-index: -1;
 }
 
 #vendorTitle p.vendorHeader{
@@ -181,9 +187,28 @@ div.graph{
 	float: right
 }
 
-#columnTitles {
-	margin-top: 1em;
+
+th, td {
+	padding: 15px;
+	height: 2em;
+}
+
+#recordTable {
 	width: auto;
 	margin-left: 3em;
 	margin-right: 10%;
+}
+
+.vendorRecordFill {
+	background-color: #f7efe3;
+	height: 3em;
+	width: 100%;
+	margin-top: 2em;
+}
+
+#vendorRecordBg{
+	position: absolute;
+	top: 5em;
+	width: 100%;
+	z-index: -1;
 }

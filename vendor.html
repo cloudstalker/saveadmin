@@ -26,11 +26,21 @@
 					<p class="lightGrayText vendorHeader">Vendor Accounts</p>
 					<button class="vendorButton grayBg button whiteText">Notify</button>
 					<button class="vendorButton greenBg button whiteText">Upload</button>
-					<button class="vendorButton greenBg button whiteText">Download</button>
+					<button class="vendorButton greenBg button whiteText" onclick="downloadVendorData()">Download</button>
 					<button class="vendorButton blueBg button whiteText">Settle</button>
 				</div>
-				<div id="columnTitles">
-					
+				<table id="recordTable">
+					<thead>
+						<tr id="vendorProperties">
+
+						</tr>
+					</tbody>
+					<tbody id="vendorRecords">
+						
+					</tbody>
+				</table>
+				<div id="vendorRecordBg">
+
 				</div>
 			</div>
 		</div>
@@ -49,29 +59,70 @@
 		};
 		firebase.initializeApp(config);
 
-		// Get a reference to the database service
-		var database = firebase.database();
-
 		// Creating column titles
 		const columnNumber = 8;
-		var divWidth = 100.0 / (columnNumber - 1);
+		var divWidth = 100.0 / (columnNumber + 1);
 		var columns = ["VendorID", "Name", "FoodcourtID", "Type", "Unsettled", "TotalRedeem", "Contact", "Password"];
-		var columnElements = [];
 		for (var i = 0; i < columnNumber; i++){
-			var division = document.createElement("DIV");
-			var para = document.createElement("P");
+			var th = document.createElement("TD");
 			var t = document.createTextNode(columns[i]);
-			division.appendChild(para);
-			division.style.display = "inline-block";
-			para.appendChild(t);
-			para.style.textAlign = "center";
-			para.style.fontSize = "75%";
-			para.style.fontWeight = "600";
-			para.style.marginLeft = "2em";
-			para.style.marginRight = "2em";
-			para.className = "darkGrayText";
-			document.getElementById("columnTitles").appendChild(division);
+			th.appendChild(t);
+			th.style.textAlign = "right";
+			th.style.fontSize = "75%";
+			th.style.fontWeight = "600";
+			th.className = "darkGrayText";
+			document.getElementById("vendorProperties").appendChild(th);
 		}
 
+		// Grabbing data & show 
+		var vendorDbRef = firebase.database().ref('/Vendor/');
+		vendorDbRef.on('value', function(snapshot){
+			var vendors = snapshot.val();
+			vendors.forEach(element => {
+				var division = document.createElement("DIV");
+				var tr = document.createElement("TR");
+				for (var i = 0; i < columnNumber; i++){
+					var td = document.createElement("TD");
+					var t = document.createTextNode(element[columns[i]]);
+					td.appendChild(t);
+					td.style.textAlign = "right";
+					td.style.fontSize = "75%";
+					tr.appendChild(td);
+				}
+				division.className = "vendorRecordFill";
+				document.getElementById("vendorRecordBg").appendChild(division);
+				document.getElementById("vendorRecords").appendChild(tr);
+			});
+		})
+
+		// Button Functions
+		function downloadVendorData(){
+			vendorDbRef.once('value').then(function(snapshot){
+				var content = new Array();
+				content.push(columns.toString() + "\n");
+				var vendors = snapshot.val();
+				vendors.forEach(element => {
+					var tempStr = "";
+					for (var i = 0; i < columnNumber; i++){
+						tempStr = tempStr + (element[columns[i]] + ",");
+					}
+					tempStr += "\n";
+					content.push(tempStr);
+				});
+				console.log(content);
+				var blob = new Blob(content, {type: 'text/csv'});
+				if(window.navigator.msSaveOrOpenBlob) {
+					window.navigator.msSaveBlob(blob, "vendorData.csv");
+				}
+				else{
+					var elem = window.document.createElement('A');
+					elem.href = window.URL.createObjectURL(blob);
+					elem.download = "vendorData.csv";        
+					document.body.appendChild(elem);
+					elem.click();        
+					document.body.removeChild(elem);
+			}	
+			});
+		}
 	</script>
 </html>
