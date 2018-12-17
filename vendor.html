@@ -48,6 +48,9 @@
 	
 	<script src="https://www.gstatic.com/firebasejs/5.7.0/firebase.js"></script>
 	<script>
+		// Global counters
+		var firstEntry = true; // whether displaying first entry
+
 		// Initialize Firebase
 		var config = {
 			apiKey: "AIzaSyD_8xDR6m1kA5Xg3YDmbbEsKdxM8HpP-44",
@@ -78,21 +81,39 @@
 		var vendorDbRef = firebase.database().ref('/Vendor/');
 		vendorDbRef.on('value', function(snapshot){
 			var vendors = snapshot.val();
-			vendors.forEach(element => {
+
+			// reset
+			var vendorRecords = document.getElementById("vendorRecords");
+			var vendorRecordBg = document.getElementById("vendorRecordBg");
+			while(vendorRecords.lastChild){
+				vendorRecords.removeChild(vendorRecords.lastChild);
+			}
+			while(vendorRecordBg.lastChild){
+				vendorRecordBg.removeChild(vendorRecordBg.lastChild);
+			}
+			firstEntry = true;
+
+			for(var element in vendors){
 				var division = document.createElement("DIV");
 				var tr = document.createElement("TR");
 				for (var i = 0; i < columnNumber; i++){
 					var td = document.createElement("TD");
-					var t = document.createTextNode(element[columns[i]]);
+					var t = document.createTextNode(vendors[element][columns[i]]);
 					td.appendChild(t);
 					td.style.textAlign = "right";
 					td.style.fontSize = "75%";
 					tr.appendChild(td);
 				}
-				division.className = "vendorRecordFill";
-				document.getElementById("vendorRecordBg").appendChild(division);
-				document.getElementById("vendorRecords").appendChild(tr);
-			});
+				if(firstEntry){
+					division.className = "vendorRecordFill";
+					firstEntry = false;
+				}
+				else{
+					division.className = "vendorRecordFillMore";
+				}
+				vendorRecordBg.appendChild(division);
+				vendorRecords.appendChild(tr);
+			}
 		})
 
 		// Button Functions
@@ -101,15 +122,14 @@
 				var content = new Array();
 				content.push(columns.toString() + "\n");
 				var vendors = snapshot.val();
-				vendors.forEach(element => {
+				for(var element in vendors){
 					var tempStr = "";
-					for (var i = 0; i < columnNumber; i++){
-						tempStr = tempStr + (element[columns[i]] + ",");
+					for (var i = 0; i < columnNumber - 1; i++){
+						tempStr = tempStr + (vendors[element][columns[i]] + ",");
 					}
-					tempStr += "\n";
+					tempStr += (vendors[element][columns[columnNumber-1]] + "\n");
 					content.push(tempStr);
-				});
-				console.log(content);
+				}
 				var blob = new Blob(content, {type: 'text/csv'});
 				if(window.navigator.msSaveOrOpenBlob) {
 					window.navigator.msSaveBlob(blob, "vendorData.csv");
@@ -129,7 +149,8 @@
 			var fileInput = document.createElement("INPUT");
 			fileInput.type = "file";
 			fileInput.accept = ".csv, text/csv";
-			fileInput.style = "visibility: hidden";
+			fileInput.style.opacity = 0;
+			fileInput.id = "hiddenInputForFileUpload";
 			fileInput.addEventListener('change', uploadedEventHandler, false);
 			document.body.appendChild(fileInput);
 			fileInput.click();
@@ -137,7 +158,25 @@
 
 		function uploadedEventHandler() {
 			const file = this.files[0];
+			var fileReader = new FileReader();
+			fileReader.onload = function(e){
+				data = e.target.result.split("\n");
+				for(var j = 1; j < data.length; j++){
+					// row not empty then...
+					if(data[j] != ""){
+						var tempObj = new Object();
+						var tempArr = data[j].split(",");
+						for(var i = 0; i < columnNumber; i++){
+							tempObj[columns[i]] = tempArr[i];
+						}
+						tempObj["Password"] == "" ? tempObj["Password"] = Math.round(100000000 * Math.random()): null;
+						var update = new Object();
+						update[tempObj["VendorID"]] = tempObj;
+						vendorDbRef.update(update);
+					}
+				}
+			}
+			fileReader.readAsText(file);
 		}
-
 	</script>
 </html>

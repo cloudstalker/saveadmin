@@ -206,6 +206,13 @@ th, td {
 	margin-top: 2em;
 }
 
+.vendorRecordFillMore {
+	background-color: #f7efe3;
+	height: 3em;
+	width: 100%;
+	margin-top: 0.5em;
+}
+
 #vendorRecordBg{
 	position: absolute;
 	top: 5em;
