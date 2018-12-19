@@ -167,25 +167,6 @@ li a:hover:not(.active) {
 		width: 12em;
 		display: none;
 	}
-	
-	li p {
-		display: block;
-		text-align: center;
-		margin: 0;
-		padding: 0.5em 1em;
-		font-weight: 800;
-		font-size: 125%;
-	}
-	
-	li a.topLvl {
-		display: block;
-		text-decoration: none;
-		text-align: center;
-		height: 100%;
-		box-sizing: border-box;
-		padding: 1em 1em;
-		font-weight: normal;
-	}
 }
 
 /* Statistics Panel Styles for index.html */

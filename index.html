@@ -7,12 +7,12 @@
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.css">
 		<link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet"> 
 	</head>
-	<body>
+	<body onresize="checkSize()">
 		<div id="pageContainer">
 			<div id="navBar">
 				<div class="whiteText" id="navBarTitle">Save Admin Tool</div>
 				<div id="menuButtonAction">
-					<img src="resources/icons/menu_icon.png" id="menuButtonImg" onmouseover="menuMouseHover()"/>
+					<img src="resources/icons/menu_icon.png" id="menuButtonImg" class="rotateAnimation" onclick="menuClicked()"/>
 				</div>
 				<ul>
 					<li class="lists"><a href="settings.html" class="topLvl whiteText">Settings</a></li>
@@ -45,6 +45,8 @@
 	
 	<script src="https://www.gstatic.com/firebasejs/5.7.0/firebase.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js"></script>
+	<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.3.1.min.js"></script>
+	<script src="jQueryRotate.js"></script>
 	<script src="common_layout.js"></script>
 	<script>
 		// Initialize Firebase
