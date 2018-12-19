@@ -8,19 +8,24 @@
 	</head>
 	<body>
 		<div id="pageContainer">
-			<ul>
-				<li class="navBarTitle"><p class="whiteText">Save Admin Tool</p></li>
-				<li><a href="settings.html" class="topLvl whiteText">Settings</a></li>
-				<li class="dropdown">
-					<a class="whiteText topLvl  active">Manage Accounts</a>
-					<div class="dropdownContent">
-						<a>Vendor Accounts</a>
-						<a>User Accounts</a>
-						<a>Admin Accounts</a>
-					</div>
-				</li>
-				<li><a href="index.html" class="topLvl whiteText">Dashboard</a></li>
-			</ul>
+			<div id="navBar">
+				<div class="whiteText" id="navBarTitle">Save Admin Tool</div>
+				<div id="menuButtonAction">
+					<img src="resources/icons/menu_icon.png" id="menuButtonImg" onmouseover="menuMouseHover()"/>
+				</div>
+				<ul>
+					<li class="lists"><a href="settings.html" class="topLvl whiteText">Settings</a></li>
+					<li class="lists dropdown">
+						<a class="whiteText topLvl active">Manage Accounts</a>
+						<div class="dropdownContent">
+							<a href="vendor.html">Vendor Accounts</a>
+							<a>User Accounts</a>
+							<a>Admin Accounts</a>
+						</div>
+					</li>
+					<li class="lists"><a href="index.html" class="topLvl whiteText">Dashboard</a></li>
+				</ul>
+			</div>
 			<div id="vendorTitle">
 				<div style="display: inline-block; width: 100%">
 					<p class="lightGrayText vendorHeader">Vendor Accounts</p>
@@ -29,16 +34,18 @@
 					<button class="vendorButton greenBg button whiteText" onclick="downloadVendorData()">Download</button>
 					<button class="vendorButton blueBg button whiteText">Settle</button>
 				</div>
-				<table id="recordTable">
-					<thead>
-						<tr id="vendorProperties">
+				<div style="overflow: auto">
+					<table id="recordTable">
+						<thead>
+							<tr id="vendorProperties">
 
-						</tr>
-					</tbody>
-					<tbody id="vendorRecords">
-						
-					</tbody>
-				</table>
+							</tr>
+						</tbody>
+						<tbody id="vendorRecords">
+							
+						</tbody>
+					</table>
+				</div>
 				<div id="vendorRecordBg">
 
 				</div>
@@ -47,6 +54,7 @@
 	</body>
 	
 	<script src="https://www.gstatic.com/firebasejs/5.7.0/firebase.js"></script>
+	<script src="common_layout.js"></script>
 	<script>
 		// Global counters
 		var firstEntry = true; // whether displaying first entry
@@ -178,5 +186,27 @@
 			}
 			fileReader.readAsText(file);
 		}
+
+		// Table scrolling
+		var inner = document.getElementById("recordTable");
+		inner.addEventListener('scroll', function(e) {
+			e.stopPropagation();
+			}, false);
+
+		inner.addEventListener('wheel', function(e) {
+			if(e.wheelDelta < 0) {
+			if((this.scrollHeight-this.scrollTop-200)<=0){
+				e.preventDefault();
+			}
+				}
+				else
+				if(this.scrollTop==0){
+				e.preventDefault();
+				}
+			}, false);
+
+		inner.addEventListener('touchmove', function(e) {
+			e.stopPropagation();
+			}, false);
 	</script>
 </html>

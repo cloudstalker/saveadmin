@@ -9,20 +9,24 @@
 	</head>
 	<body>
 		<div id="pageContainer">
-			<ul>
-				<li class="navBarTitle"><p class="whiteText">Save Admin Tool</p></li>
-				<li><a href="settings.html" class="topLvl whiteText">Settings</a></li>
-				<li class="dropdown">
-					<a class="whiteText topLvl">Manage Accounts</a>
-					<div class="dropdownContent">
-						<a href="vendor.html">Vendor Accounts</a>
-						<a>User Accounts</a>
-						<a>Admin Accounts</a>
-					</div>
-				</li>
-				<li><a href="index.html" class="topLvl active whiteText">Dashboard</a></li>
-			</ul>
-
+			<div id="navBar">
+				<div class="whiteText" id="navBarTitle">Save Admin Tool</div>
+				<div id="menuButtonAction">
+					<img src="resources/icons/menu_icon.png" id="menuButtonImg" onmouseover="menuMouseHover()"/>
+				</div>
+				<ul>
+					<li class="lists"><a href="settings.html" class="topLvl whiteText">Settings</a></li>
+					<li class="lists dropdown">
+						<a class="whiteText topLvl">Manage Accounts</a>
+						<div class="dropdownContent">
+							<a href="vendor.html">Vendor Accounts</a>
+							<a>User Accounts</a>
+							<a>Admin Accounts</a>
+						</div>
+					</li>
+					<li class="lists"><a href="index.html" class="topLvl whiteText active">Dashboard</a></li>
+				</ul>
+			</div>
 			<div id="statTitle">
 				<img src="resources/icons/stat_icon.png"/>
 				<p class="darkGrayText">Statistics</p>
@@ -41,6 +45,7 @@
 	
 	<script src="https://www.gstatic.com/firebasejs/5.7.0/firebase.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js"></script>
+	<script src="common_layout.js"></script>
 	<script>
 		// Initialize Firebase
 		var config = {
@@ -56,9 +61,8 @@
 		// Get a reference to the database service
 		var database = firebase.database();
 
-		// Test
-		var dbref = firebase.database().ref('/Stalls/stall1');
-
+		var a = document.createElement("a");
+		a.style.disp
 		// Drawing graphs
 		var graph1 = document.getElementById('firstGraph');
 		var items = [

@@ -1,23 +1,14 @@
 <!DOCTYPE html>
 <html>
-    <input type="file" id="files" name="files[]" multiple />
-    <output id="list"></output>
-    
-    <script>
-      function handleFileSelect(evt) {
-        var files = evt.target.files; // FileList object
-    
-        // files is a FileList of File objects. List some properties.
-        var output = [];
-        for (var i = 0, f; f = files[i]; i++) {
-          output.push('<li><strong>', escape(f.name), '</strong> (', f.type || 'n/a', ') - ',
-                      f.size, ' bytes, last modified: ',
-                      f.lastModifiedDate ? f.lastModifiedDate.toLocaleDateString() : 'n/a',
-                      '</li>');
-        }
-        document.getElementById('list').innerHTML = '<ul>' + output.join('') + '</ul>';
-      }
-    
-      document.getElementById('files').addEventListener('change', handleFileSelect, false);
-    </script>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<head>
+		<title>Save Admin Tool</title>
+		<link rel="stylesheet" type="text/css" href="style.css">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.css">
+		<link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet"> 
+	</head>
+	<body>
+		<p>ab<span style="display: inline-block">def</span>c</p>
+		
+	</body>
 </html>
