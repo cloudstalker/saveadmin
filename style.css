@@ -25,9 +25,9 @@ body {
 
 .button {
 	height: 2.25em;
-	width: 8em;
+	width: auto;
 	margin-right: 2em;
-	text-align: center;
+	padding: 0 1.5em;
 	border: none;
 	font-size: 75%;
 	border-radius: 1.125em;
@@ -45,6 +45,10 @@ button.greenBg:hover {
 
 .blueBg {
 	background-color: #4A90E2;
+}
+
+button.blueBg:hover {
+	background-color: #76abe9;
 }
 
 .grayBg {
@@ -233,9 +237,23 @@ div.graph{
 
 .vendorButton {
 	margin-top: 1.5em;
-	float: right
+	float: right;
 }
 
+.vendorButton img{
+	width: 20px; 
+	height: 20px; 
+	position: relative;
+	left: 0;
+	top: 0.2em;
+	margin-right: 0.5em;
+}
+
+.vendorButton p{
+	display: inline-block;
+	vertical-align: super;
+	margin: 0;
+}
 
 th, td {
 	padding: 15px;

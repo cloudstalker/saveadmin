@@ -6,12 +6,12 @@
 		<link rel="stylesheet" type="text/css" href="style.css">
 		<link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet"> 
 	</head>
-	<body>
+	<body onresize="checkSize()">
 		<div id="pageContainer">
 			<div id="navBar">
 				<div class="whiteText" id="navBarTitle">Save Admin Tool</div>
 				<div id="menuButtonAction">
-					<img src="resources/icons/menu_icon.png" id="menuButtonImg" onmouseover="menuMouseHover()"/>
+					<img src="resources/icons/menu_icon.png" id="menuButtonImg" onclick="menuClicked()"/>
 				</div>
 				<ul>
 					<li class="lists"><a href="settings.html" class="topLvl whiteText">Settings</a></li>
@@ -29,10 +29,18 @@
 			<div id="vendorTitle">
 				<div style="display: inline-block; width: 100%">
 					<p class="lightGrayText vendorHeader">Vendor Accounts</p>
-					<button class="vendorButton grayBg button whiteText">Notify</button>
-					<button class="vendorButton greenBg button whiteText" onclick="uploadVendorData()">Upload</button>
-					<button class="vendorButton greenBg button whiteText" onclick="downloadVendorData()">Download</button>
-					<button class="vendorButton blueBg button whiteText">Settle</button>
+					<button class="vendorButton greenBg button" onclick="uploadVendorData()">
+						<img src="resources/icons/duload_icon.png" style="transform: rotate(180deg)"/>
+						<p class="whiteText">Upload</p>
+					</button>
+					<button class="vendorButton greenBg button" onclick="downloadVendorData()">
+						<img src="resources/icons/duload_icon.png"/>
+						<p class="whiteText">Download</p>
+					</button>
+					<button class="vendorButton blueBg button">
+						<img src="resources/icons/settle_icon.png"/>
+						<p class="whiteText">Settle</p>
+					</button>
 				</div>
 				<div style="overflow: auto">
 					<table id="recordTable">
