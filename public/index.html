@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Admin Log In</title>
+        <link rel="stylesheet" type="text/css" href="style.css">
+    </head>
+    <body>
+        <div style="margin: 5em auto; width: 20em; height: 13em; padding: 1em 1em; background-color: #f7efe3; border-radius: 2em">
+            <h2 style="color: #4A4A4A; margin-bottom: 1em; margin-top: 0" align="center">Admin Login</h2>
+            <input id="userName" type="text" placeholder="Username" style="margin: 1em auto; display: block"/>
+            <input id="password" type="password" placeholder="Password" onkeyup="enterToSignIn()" style="margin: 1em auto; display: block"/>
+            <button class="button greenBg whiteText" style="margin:1em auto; display: block" onclick="signIn()">Sign in</button>
+            <div id="wrongCredential" class="redText" style="text-align: center; display: none; margin-top: 0.5em">Wrong user name or password</div>
+        </div>
+
+        <script src="https://www.gstatic.com/firebasejs/5.7.1/firebase.js"></script>
+        <script>
+            // Initialize Firebase
+            var config = {
+                apiKey: "AIzaSyD_8xDR6m1kA5Xg3YDmbbEsKdxM8HpP-44",
+                authDomain: "nussave-app.firebaseapp.com",
+                databaseURL: "https://nussave-app.firebaseio.com",
+                projectId: "nussave-app",
+                storageBucket: "nussave-app.appspot.com",
+                messagingSenderId: "770570652465"
+            };
+            firebase.initializeApp(config);
+
+            function signIn(){
+                if(document.getElementById("userName").value == "admin" && document.getElementById("password").value == "1234"){
+                    document.getElementById("wrongCredential").style.display = "none";
+                    window.location.href = "dashboard.html";
+                }
+                else
+                {
+                    document.getElementById("wrongCredential").style.display = "block";
+                }
+            }
+            
+            var textField = document.getElementById("password");
+            textField.onkeyup = function(e){
+                if(e.keyCode == 13 || e.which == 13){
+                    signIn();
+                }
+            } 
+        </script>
+    </body>
+</html>

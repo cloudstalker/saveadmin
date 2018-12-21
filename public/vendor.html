@@ -37,7 +37,7 @@
 						<img src="resources/icons/duload_icon.png"/>
 						<p class="whiteText">Download</p>
 					</button>
-					<button class="vendorButton blueBg button">
+					<button class="vendorButton blueBg button" onclick="openSettleModal()">
 						<img src="resources/icons/settle_icon.png"/>
 						<p class="whiteText">Settle</p>
 					</button>
@@ -57,6 +57,11 @@
 				<div id="vendorRecordBg">
 
 				</div>
+			</div>
+		</div>
+		<div class="modal">
+			<div id="settleModal">
+				<h4 class="darkGrayText">Preparing for Reimbursement</h4>
 			</div>
 		</div>
 	</body>
@@ -135,6 +140,17 @@
 		})
 
 		// Button Functions
+		var modal = document.getElementsByClassName("modal")[0];
+		function openSettleModal(){
+			modal.style.display = "block";
+		}
+
+		window.onclick = function(event){
+			if (event.target == modal) {
+					modal.style.display = "none";
+			}
+		}
+
 		function downloadVendorData(){
 			vendorDbRef.once('value').then(function(snapshot){
 				var content = new Array();

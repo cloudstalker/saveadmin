@@ -23,6 +23,10 @@ body {
 	color: #ffffff;
 }
 
+.redText {
+	color: red;
+}
+
 .button {
 	height: 2.25em;
 	width: auto;
@@ -261,6 +265,26 @@ th, td {
 	top: 5em;
 	width: 100%;
 	z-index: -1;
+}
+
+.modal{
+	display: none; /* Hidden by default */
+	position: fixed; /* Stay in place */
+	z-index: 10; /* Sit on top */
+	left: 0;
+	top: 0;
+	width: 100%; /* Full width */
+	height: 100%; /* Full height */
+	overflow: auto; /* Enable scroll if needed */
+	background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+#settleModal {
+	margin: 15% auto;
+	height: 30em;
+	width: 25em;
+	background-color: #ebd7ba;
+	box-shadow: 0 3px 20px #b09671;
 }
 
 /* Use a media query to add a breakpoint at 600px: */
