@@ -1,6 +1,7 @@
 // Hamburger Menu Actions
 function menuClicked(){
     var lists = document.getElementsByTagName("li");
+    var buttons = document.getElementsByClassName("vendorButton");
     for(var element of lists){
         if(element.style.display == "block"){
             element.style.display = "none";
@@ -9,6 +10,9 @@ function menuClicked(){
                 animateTo: 0,
                 duration: 200
             });
+            for(var button of buttons){
+                button.style.zIndex = "1";
+            }
         }
         else{
             element.style.display = "block";
@@ -17,6 +21,9 @@ function menuClicked(){
                 animateTo: 90,
                 duration: 200
             });
+            for(var button of buttons){
+                button.style.zIndex = "0";
+            }
         }
     }
 }
