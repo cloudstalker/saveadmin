@@ -34,6 +34,10 @@ function checkSize(){
         for(var element of lists){
             element.style.display = "block";
             $("#menuButtonImg").rotate(0);
+            var buttons = document.getElementsByClassName("vendorButton");
+            for(var button of buttons){
+                button.style.zIndex = "0";
+            }
         }
     }
     else{

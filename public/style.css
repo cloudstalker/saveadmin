@@ -217,7 +217,7 @@ div.graph{
 	margin-top: 1.5em;
 	float: right;
 	position: relative;
-	z-index: 1;
+	z-index: 0;
 }
 
 .vendorButton img{
