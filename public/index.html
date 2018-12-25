@@ -16,6 +16,9 @@
         </div>
 
         <script src="https://www.gstatic.com/firebasejs/5.7.1/firebase.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/5.7.0/firebase-app.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/5.7.0/firebase-auth.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/5.7.0/firebase-functions.js"></script>
         <script src="common_backend.js"></script>
         <script>
             // Initialize Firebase
@@ -29,38 +32,28 @@
             };
             firebase.initializeApp(config);
 
-            var admins;
-            adminDbRef = firebase.database().ref('/User/Admin');
-            adminDbRef.on('value', function(snapshot){
-                admins = snapshot.val();
-            })
+            // var admins;
+            // adminDbRef = firebase.database().ref('/User/Admin');
+            // adminDbRef.on('value', function(snapshot){
+            //     admins = snapshot.val();
+            // })
 
             function signIn(){
-                    var haveRightCred = false;
-                    for(var admin in admins){
-                        if(document.getElementById("userName").value == admins[admin]["username"] 
-                        && document.getElementById("password").value == admins[admin]["password"]){
-                            haveRightCred = true;
-                            var d = new Date();
-                            d.setTime(d.getTime() + 30*60*1000);
-                            var uuid = uuidv4();
-                            document.cookie = "uuid=" + uuid + "; expires=" + d.toUTCString() + ";path=/";
-                            admins[admin]["logInState"] = 1;
-                            admins[admin]["uuid"] = uuid;
-                            var update = new Object();
-                            update[admin] = admins[admin];
-                            adminDbRef.update(update);
-                            break;
-                        }
-                    }
-                    if(haveRightCred){
-                        document.getElementById("wrongCredential").style.display = "none";
-                        window.location.href = "dashboard.html";
-                    }
-                    else{
-                        document.getElementById("wrongCredential").style.display = "block";
+                var functions = firebase.functions();
+                var getToken = functions.httpsCallable('getToken');
+                getToken({username: document.getElementById("userName").value,
+                        password: document.getElementById("password").value}).then(function(result){
+                            console.log(result);
+                        })
+                    // if(haveRightCred){
+                    //     document.getElementById("wrongCredential").style.display = "none";
+                    //     window.location.href = "dashboard.html";
+                    // }
+                    // else{
+                    //     document.getElementById("wrongCredential").style.display = "block";
+            // }
                 }
-            }
+            
             var textField = document.getElementById("password");
             textField.onkeyup = function(e){
                 if(e.keyCode == 13 || e.which == 13){
