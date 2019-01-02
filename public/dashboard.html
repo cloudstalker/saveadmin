@@ -9,24 +9,6 @@
 		<meta name="theme-color" content="#63ab5b" />
 	</head>
 	<body onresize="checkSize()">
-		<script src="https://www.gstatic.com/firebasejs/5.7.0/firebase.js"></script>
-		<script src="common_backend.js"></script>
-		<script>
-			// Global counters
-			var firstEntry = true; // whether displaying first entry
-
-			// Initialize Firebase
-			var config = {
-				apiKey: "AIzaSyD_8xDR6m1kA5Xg3YDmbbEsKdxM8HpP-44",
-				authDomain: "nussave-app.firebaseapp.com",
-				databaseURL: "https://nussave-app.firebaseio.com",
-				projectId: "nussave-app",
-				storageBucket: "nussave-app.appspot.com",
-				messagingSenderId: "770570652465"
-			};
-			firebase.initializeApp(config);
-
-		</script>
 		<div id="pageContainer">
 			<div id="navBar">
 				<div class="whiteText" id="navBarTitle">Save Admin Tool</div>
@@ -59,6 +41,24 @@
 				</div>
 			</div>
 		</div>
+		<script src="https://www.gstatic.com/firebasejs/5.7.0/firebase-app.js"></script>
+		<script src="https://www.gstatic.com/firebasejs/5.7.0/firebase-auth.js"></script>
+		<script src="common_backend.js"></script>
+		<script>
+			// Global counters
+			var firstEntry = true; // whether displaying first entry
+
+			// Initialize Firebase
+			var config = {
+				apiKey: "AIzaSyD_8xDR6m1kA5Xg3YDmbbEsKdxM8HpP-44",
+				authDomain: "nussave-app.firebaseapp.com",
+				databaseURL: "https://nussave-app.firebaseio.com",
+				projectId: "nussave-app",
+				storageBucket: "nussave-app.appspot.com",
+				messagingSenderId: "770570652465"
+			};
+			firebase.initializeApp(config);
+		</script>
 	</body>
 	
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js"></script>
@@ -66,6 +66,13 @@
 	<script src="jQueryRotate.js"></script>
 	<script src="common_layout.js"></script>
 	<script>
+		firebase.auth().onAuthStateChanged(function(user) {
+			if(!user){
+				alert("Sign in first!");
+				window.location.href = "index.html";
+			}
+		});
+
 		var a = document.createElement("a");
 		a.style.disp
 		// Drawing graphs
