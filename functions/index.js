@@ -1,40 +1,55 @@
 const functions = require('firebase-functions');
 
-var admin = require("firebase-admin");
-admin.initializeApp({
-  serviceAccountId: "firebase-adminsdk-kzujk@nussave-app.iam.gserviceaccount.com"
+var adminInstance = require("firebase-admin");
+var serviceAccount = require('./serviceAcc.json');
+adminInstance.initializeApp({
+    credential: adminInstance.credential.cert(serviceAccount),
+    databaseURL: 'https://nussave-app.firebaseio.com'
 });
 
-console.log(process.env.FIREBASE_CONFIG);
-
-exports.getToken = functions.https.onCall((data, context) => {
-    adminDbRef = admin.database().instance("nussave-app").ref('/User/Admin');
-    adminDbRef.once('value', function(snapshot){
+// Getting Login Info & Giving custom tokens back to the client
+exports.getToken = functions.region('asia-northeast1').https.onCall((data, context) => {
+    const username = data["username"];
+    const password = data["password"];
+    return adminInstance.database().ref('/User/Admin').once('value')
+    .then(function(snapshot)
+    {
         admins = snapshot.val();
         var rightCred = false;
         var adminId;
         for(var admin in admins){
-            if(data["username"] == admins[admin]["username"] 
-                && data["password"] == admins[admin]["password"]){
+            if(username == admins[admin]["username"] 
+                && password == admins[admin]["password"]){
                     rightCred = true;
                     adminId = admin;
                     break;
             }
         }
+
         if(rightCred){
             var additionalClaims = {
                 isAdmin: true
             }
-            admin.auth().createCustomToken(adminId).then(function(customToken) {
-                return customToken;
+            return adminInstance.auth().createCustomToken(adminId, additionalClaims).then(function(customToken) {
+                console.log("Admin '" + username + "' trying to sign in");
+                return {
+                    token: customToken
+                };
                 })
                 .catch(function(error) {
-                console.log("Error creating custom token:", error);
+                    console.log("Error creating custom token:", error);
                 });
         }
         else{
             // Wrong credentials
-            return null;
+            console.log("Wrong credential for " + username);
+            return {
+                token: "null"
+            };
         }
     })
+    .catch(error => {
+        console.log("error: " + error);
+    })
+    
 });

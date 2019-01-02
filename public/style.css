@@ -59,6 +59,18 @@ button.blueBg:hover {
 	background-color: #9B9B9B;
 }
 
+.modal{
+	display: none; /* Hidden by default */
+	position: fixed; /* Stay in place */
+	z-index: 10; /* Sit on top */
+	left: 0;
+	top: 0;
+	width: 100%; /* Full width */
+	height: 100%; /* Full height */
+	overflow: auto; /* Enable scroll if needed */
+	background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
 /* Navigation Bar Styles */
 #navBar{ 
 	background-color: #63ab5b;
@@ -151,7 +163,7 @@ li a:hover:not(.active) {
 	display: none;
 }
 
-/* Statistics Panel Styles for index.html */
+/* Statistics Panel Styles for dashboard.html */
 #statTitle{
 	background-color: #f3e7d5;
 	height: 4em;
@@ -172,7 +184,7 @@ li a:hover:not(.active) {
 	display: inline;
 }
 
-/* Graph Section for index.html*/
+/* Graph Section for dashboard.html*/
 div.graphInstance{
 	box-shadow: 0 0 23px #b09671;
 	max-width: 600px;
@@ -244,6 +256,7 @@ th, td {
 	width: auto;
 	margin-left: 3em;
 	margin-right: 10%;
+	table-layout: fixed;
 }
 
 .vendorRecordFill {
@@ -267,17 +280,6 @@ th, td {
 	z-index: -1;
 }
 
-.modal{
-	display: none; /* Hidden by default */
-	position: fixed; /* Stay in place */
-	z-index: 10; /* Sit on top */
-	left: 0;
-	top: 0;
-	width: 100%; /* Full width */
-	height: 100%; /* Full height */
-	overflow: auto; /* Enable scroll if needed */
-	background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
-}
 
 #settleModal {
 	margin: 15% auto;

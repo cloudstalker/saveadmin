@@ -63,3 +63,9 @@ node_modules/
 
 # dotenv environment variables file
 .env
+
+#serviceAcc
+functions/serviceAcc.json
+
+#.gitignore itself
+.gitignore

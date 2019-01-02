@@ -8,7 +8,9 @@
 		<meta name="theme-color" content="#63ab5b" />
 	</head>
 	<body onresize="checkSize()">
-		<script src="https://www.gstatic.com/firebasejs/5.7.0/firebase.js"></script>
+		<script src="https://www.gstatic.com/firebasejs/5.7.0/firebase-app.js"></script>
+		<script src="https://www.gstatic.com/firebasejs/5.7.0/firebase-database.js"></script>
+		<script src="https://www.gstatic.com/firebasejs/5.7.0/firebase-auth.js"></script>
 		<script src="common_backend.js"></script>
 		<script>
 			// Global counters
@@ -24,32 +26,8 @@
 				messagingSenderId: "770570652465"
 			};
 			firebase.initializeApp(config);
+			var vendorDbRef = firebase.database().ref('/User/Vendor/');
 
-			// // Mask
-			// var mask = document.createElement("DIV");
-			// mask.style.width = "100%";
-			// mask.style.height = "100%";
-			// mask.style.position = "absolute";
-			// mask.style.zIndex = "100";
-			// mask.style.backgroundColor = "snow";
-			// document.body.appendChild(mask);
-
-			// // Find out if current user is logged in (potential hazard)
-			// var adminDbRef = firebase.database().ref('/User/Admin');
-			// var logInValid = false;
-			// adminDbRef.once('value').then(function(snapshot){
-			// 	var admins = snapshot.val();
-			// 	for(var admin in admins){
-			// 		if(admins[admin]["logInState"] == 1 && admins[admin]["uuid"] == getCookie("uuid")){
-			// 			logInValid = true;
-			// 			document.body.removeChild(mask);
-			// 			break;
-			// 		}
-			// 	}
-			// 	if(!logInValid){
-			// 		window.location.href = "index.html";
-			// 	}
-			// })
 		</script>	
 		<div id="pageContainer">
 			<div id="navBar">
@@ -63,7 +41,6 @@
 						<a class="whiteText topLvl active">Manage Accounts</a>
 						<div class="dropdownContent">
 							<a href="vendor.html">Vendor Accounts</a>
-							<a>User Accounts</a>
 							<a>Admin Accounts</a>
 						</div>
 					</li>
@@ -115,10 +92,20 @@
 	<script src="jQueryRotate.js"></script>
 	<script src="common_layout.js"></script>
 	<script>
-		// Creating column titles
-		const columnNumber = 8;
-		var divWidth = 100.0 / (columnNumber + 1);
-		var columns = ["VendorID", "Name", "FoodcourtID", "Type", "Unsettled", "TotalRedeem", "Contact", "Password"];
+		// Creating column titles (Semantics)
+		var columns = 
+		["VendorID",
+		 "Name", 
+		 "Foodcourt",
+		 "Type", 
+		 "Pending Reimburse", 
+		 "Total Amount", 
+		 "Total Stickers Issued",
+		 "Total Stickers Redeemed",
+		 "Phone", 
+		 "Email", 
+		 "Password"];
+		const columnNumber = columns.length;
 		for (var i = 0; i < columnNumber; i++){
 			var th = document.createElement("TD");
 			var t = document.createTextNode(columns[i]);
@@ -126,48 +113,95 @@
 			th.style.textAlign = "right";
 			th.style.fontSize = "75%";
 			th.style.fontWeight = "600";
+			th.style.whiteSpace = "nowrap";
 			th.className = "darkGrayText";
 			document.getElementById("vendorProperties").appendChild(th);
 		}
 
-		// Grabbing data & show 
-		var vendorDbRef = firebase.database().ref('/Vendor/');
-		vendorDbRef.on('value', function(snapshot){
-			var vendors = snapshot.val();
+		// Vendor db entry names (Entries), foodCourtId @ index -> 2
+		var vendorEntries = 
+		["id",
+		"name",
+		"foodCourtId",
+		"boxType",
+		"amountCreditedSinceLastReimbursement", 
+		"amountCredited", 
+		"totalStickerAdded",
+		"totalStickerRedeemed",
+		"contactNumber",
+		"email",
+		"password"
+		];
 
-			// reset
-			var vendorRecords = document.getElementById("vendorRecords");
-			var vendorRecordBg = document.getElementById("vendorRecordBg");
-			while(vendorRecords.lastChild){
-				vendorRecords.removeChild(vendorRecords.lastChild);
-			}
-			while(vendorRecordBg.lastChild){
-				vendorRecordBg.removeChild(vendorRecordBg.lastChild);
-			}
-			firstEntry = true;
+		// Entry <-> Semantics Mapping (TODO) Currently Direct
 
-			for(var element in vendors){
-				var division = document.createElement("DIV");
-				var tr = document.createElement("TR");
-				for (var i = 0; i < columnNumber; i++){
-					var td = document.createElement("TD");
-					var t = document.createTextNode(vendors[element][columns[i]]);
-					td.appendChild(t);
-					td.style.textAlign = "right";
-					td.style.fontSize = "75%";
-					tr.appendChild(td);
-				}
-				if(firstEntry){
-					division.className = "vendorRecordFill";
-					firstEntry = false;
-				}
-				else{
-					division.className = "vendorRecordFillMore";
-				}
-				vendorRecordBg.appendChild(division);
-				vendorRecords.appendChild(tr);
+		// Grabbing data & show
+		firebase.auth().onAuthStateChanged(function(user) {
+			if (user) {
+				// signed in
+				var foodCourtDbRef = firebase.database().ref('/FoodCourt');
+				vendorDbRef.on('value', function(vsnapshot){
+					var vendors = vsnapshot.val();
+					foodCourtDbRef.once('value').then((fsnapshot) => {
+						var foodCourts = fsnapshot.val();
+
+						// reset
+						var vendorRecords = document.getElementById("vendorRecords");
+						var vendorRecordBg = document.getElementById("vendorRecordBg");
+						while(vendorRecords.lastChild){
+							vendorRecords.removeChild(vendorRecords.lastChild);
+						}
+						while(vendorRecordBg.lastChild){
+							vendorRecordBg.removeChild(vendorRecordBg.lastChild);
+						}
+						firstEntry = true;
+
+						for(var vendor in vendors){
+							var division = document.createElement("DIV");
+							var tr = document.createElement("TR");
+							for (var i = 0; i < columnNumber; i++){
+								var td = document.createElement("TD");
+								if(i == 2){
+									var foodCourtId = vendors[vendor][vendorEntries[i]];
+									for(var foodCourt in foodCourts){
+										if(foodCourtId == foodCourts[foodCourt]["id"]){
+											var t = document.createTextNode(foodCourts[foodCourt]["name"]);
+											td.appendChild(t);
+											td.style.textAlign = "right";
+											td.style.fontSize = "75%";
+											tr.appendChild(td);
+											break;
+										}
+									}
+								}
+								else{
+									var t = document.createTextNode(vendors[vendor][vendorEntries[i]]);
+									td.appendChild(t);
+									td.style.textAlign = "right";
+									td.style.fontSize = "75%";
+									tr.appendChild(td);
+								}
+							}
+							if(firstEntry){
+								division.className = "vendorRecordFill";
+								firstEntry = false;
+							}
+							else{
+								division.className = "vendorRecordFillMore";
+							}
+							vendorRecordBg.appendChild(division);
+							vendorRecords.appendChild(tr);
+						}
+					})
+				})
+			} 
+			else {
+				// No user is signed in.
+				alert("Sign in first!");
+				window.location.href = "index.html";
 			}
 		})
+		
 
 		// Button Functions
 		var modal = document.getElementsByClassName("modal")[0];
@@ -189,9 +223,9 @@
 				for(var element in vendors){
 					var tempStr = "";
 					for (var i = 0; i < columnNumber - 1; i++){
-						tempStr = tempStr + (vendors[element][columns[i]] + ",");
+						tempStr = tempStr + (vendors[element][vendorEntries[i]] + ",");
 					}
-					tempStr += (vendors[element][columns[columnNumber-1]] + "\n");
+					tempStr += (vendors[element][vendorEntries[columnNumber-1]] + "\n");
 					content.push(tempStr);
 				}
 				var blob = new Blob(content, {type: 'text/csv'});
@@ -206,6 +240,10 @@
 					elem.click();        
 					document.body.removeChild(elem);
 			}	
+			})
+			.catch((error) => {
+				alert(error);
+				window.location.href = "index.html";
 			});
 		}
 
@@ -231,12 +269,14 @@
 						var tempObj = new Object();
 						var tempArr = data[j].split(",");
 						for(var i = 0; i < columnNumber; i++){
-							tempObj[columns[i]] = tempArr[i];
+							tempObj[vendorEntries[i]] = tempArr[i];
 						}
 						tempObj["Password"] == "" ? tempObj["Password"] = Math.round(100000000 * Math.random()): null;
 						var update = new Object();
 						update[tempObj["VendorID"]] = tempObj;
-						vendorDbRef.update(update);
+						vendorDbRef.update(update).catch((error) => {
+							alert(error);
+							});
 					}
 				}
 			}

@@ -26,32 +26,6 @@
 			};
 			firebase.initializeApp(config);
 
-
-			// Mask
-			var mask = document.createElement("DIV");
-			mask.style.width = "100%";
-			mask.style.height = "100%";
-			mask.style.position = "absolute";
-			mask.style.zIndex = "100";
-			mask.style.backgroundColor = "snow";
-			document.body.appendChild(mask);
-
-			// Find out if current user is logged in (potential hazard)
-			var adminDbRef = firebase.database().ref('/User/Admin');
-			var logInValid = false;
-			adminDbRef.once('value').then(function(snapshot){
-				var admins = snapshot.val();
-				for(var admin in admins){
-					if(admins[admin]["logInState"] == 1 && admins[admin]["uuid"] == getCookie("uuid")){
-						logInValid = true;
-						document.body.removeChild(mask);
-						break;
-					}
-				}
-				if(!logInValid){
-					window.location.href = "index.html";
-				}
-			})
 		</script>
 		<div id="pageContainer">
 			<div id="navBar">
@@ -65,7 +39,6 @@
 						<a class="whiteText topLvl">Manage Accounts</a>
 						<div class="dropdownContent">
 							<a href="vendor.html">Vendor Accounts</a>
-							<a>User Accounts</a>
 							<a>Admin Accounts</a>
 						</div>
 					</li>

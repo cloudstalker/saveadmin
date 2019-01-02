@@ -14,8 +14,15 @@
             <button class="button greenBg whiteText" style="margin:1em auto; display: block" onclick="signIn()">Sign in</button>
             <div id="wrongCredential" class="redText" style="text-align: center; display: none; margin-top: 0.5em">Wrong user name or password</div>
         </div>
+        <div class="modal">
+            <div id="logInModal" style="position: absolute; width: 20em; height: 5em;
+             background-color:honeydew; left: calc(50% - 10em); top: calc(50% - 2.5em);
+             display: flex; justify-content: center; align-items: center">
+                <img src="resources/icons/treeProgress.gif" style="width: 50px;"/>
+                Logging you in, please wait...
+            </div>
+        </div>
 
-        <script src="https://www.gstatic.com/firebasejs/5.7.1/firebase.js"></script>
         <script src="https://www.gstatic.com/firebasejs/5.7.0/firebase-app.js"></script>
         <script src="https://www.gstatic.com/firebasejs/5.7.0/firebase-auth.js"></script>
         <script src="https://www.gstatic.com/firebasejs/5.7.0/firebase-functions.js"></script>
@@ -32,27 +39,35 @@
             };
             firebase.initializeApp(config);
 
-            // var admins;
-            // adminDbRef = firebase.database().ref('/User/Admin');
-            // adminDbRef.on('value', function(snapshot){
-            //     admins = snapshot.val();
-            // })
-
             function signIn(){
-                var functions = firebase.functions();
+                var functions = firebase.app().functions('asia-northeast1');
                 var getToken = functions.httpsCallable('getToken');
+                var modal = document.getElementsByClassName("modal")[0];
+                modal.style.display = "block";
+                document.getElementById("wrongCredential").style.display = "none";
                 getToken({username: document.getElementById("userName").value,
                         password: document.getElementById("password").value}).then(function(result){
-                            console.log(result);
-                        })
-                    // if(haveRightCred){
-                    //     document.getElementById("wrongCredential").style.display = "none";
-                    //     window.location.href = "dashboard.html";
-                    // }
-                    // else{
-                    //     document.getElementById("wrongCredential").style.display = "block";
-            // }
-                }
+                            if(result.data.token != "null"){
+                                firebase.auth().signInWithCustomToken(result.data.token)
+                                .then(() => {
+                                    window.location.href = "dashboard.html";
+                                })
+                                .catch(function(error) {
+                                    // Handle Errors here.
+                                    var errorCode = error.code;
+                                    var errorMessage = error.message;
+                                    alert(error.code + error.message);
+                                    modal.style.display = "none";
+                                });
+                                
+                            }
+                            else{
+                                modal.style.display = "none";
+                                document.getElementById("wrongCredential").style.display = "block";
+                            }
+                    }
+                )
+            }
             
             var textField = document.getElementById("password");
             textField.onkeyup = function(e){
