@@ -4,7 +4,6 @@
 	<head>
 		<title>Save Admin Tool</title>
 		<link rel="stylesheet" type="text/css" href="style.css">
-		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.css">
 		<link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet"> 
 		<meta name="theme-color" content="#63ab5b" />
 	</head>
@@ -34,7 +33,7 @@
 
 			<div class="graphInstance">
 				<div class="graphTitle">
-					<p class="whiteText">Weekly Sign In</p>
+					<p class="whiteText">Weekly Sign Up</p>
 				</div>
 				<div class="graph" id="firstGraph">
 
@@ -42,6 +41,7 @@
 			</div>
 		</div>
 		<script src="https://www.gstatic.com/firebasejs/5.7.0/firebase-app.js"></script>
+		<script src="https://www.gstatic.com/firebasejs/5.7.0/firebase-database.js"></script>
 		<script src="https://www.gstatic.com/firebasejs/5.7.0/firebase-auth.js"></script>
 		<script src="common_backend.js"></script>
 		<script>
@@ -61,10 +61,11 @@
 		</script>
 	</body>
 	
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js"></script>
 	<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.3.1.min.js"></script>
+	<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 	<script src="jQueryRotate.js"></script>
 	<script src="common_layout.js"></script>
+	<script src="common_backend.js"></script>
 	<script>
 		firebase.auth().onAuthStateChanged(function(user) {
 			if(!user){
@@ -73,25 +74,40 @@
 			}
 		});
 
-		var a = document.createElement("a");
-		a.style.disp
-		// Drawing graphs
-		var graph1 = document.getElementById('firstGraph');
-		var items = [
-		{x: '2014-06-11', y: 10},
-		{x: '2014-06-12', y: 25},
-		{x: '2014-06-13', y: 30},
-		{x: '2014-06-14', y: 10},
-		{x: '2014-06-15', y: 15},
-		{x: '2014-06-16', y: 30}
-		];
-		var dataset = new vis.DataSet(items);
-		var options = {
-			start: '2014-06-10',
-			end: '2014-06-18',
-			drawPoints: {style: 'circle'},
-			shaded: {orientation: 'bottom'}
-		};
-		var graph2d = new vis.Graph2d(graph1, dataset, options);
+		var stuDbRef = firebase.database().ref('/User/Student');
+
+		stuDbRef.once('value').then((snapshot)=>{
+			var students = snapshot.val();
+			var currentDay = new Date();
+			var currentWeek = getWeek(currentDay);
+			var signUpData = {};
+			for(var i=0; i<7; i++){
+				var calcDay = new Date(currentWeek[0].getTime() + 60*60*24*1000*i);
+				signUpData[yyyymmdd(calcDay)] = 0;
+			}
+			for(var student in students){
+				var dateOfSignUp = students[student]['signUpDate'];
+				var jsDateOfSignUp = new Date(dateOfSignUp);
+				if(jsDateOfSignUp >= currentWeek[0] && jsDateOfSignUp <= currentWeek[1]){
+					signUpData[yyyymmdd(jsDateOfSignUp)] += 1;
+				}
+			}
+			// Drawing graphs
+			var graph1 = document.getElementById('firstGraph');
+			var dates = [];
+			var counts = [];
+			for(var dataPoint in signUpData){
+				dates.push(dataPoint);
+				counts.push(signUpData[dataPoint]);
+			}
+			var trace = {}
+			trace['x'] = dates;
+			trace['y'] = counts;
+			trace['mode'] = 'lines';
+			console.log(trace);
+			Plotly.plot(graph1, [trace], 
+			{xaxis: {type: 'date', title: "Date"}, yaxis: {title: "User Sign-ups"},
+				margin: { t: 0 } } );
+		})
 	</script>
 </html>

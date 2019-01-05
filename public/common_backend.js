@@ -24,3 +24,17 @@ function getCookie(cname) {
     }
     return "";
 }
+
+// Date format in the DB is mm/dd/yyyy. Use Date object in JS.
+// Getting current week
+function getWeek(date) {
+    var monday = new Date(date.getTime() - 60*60*24*date.getDay()*1000);  
+    var sunday = new Date(date.getTime() + 60*60*24*6*1000);
+    return [monday, sunday];
+}
+// Transforming date into yyyy-mm-dd which vis2d can recognize
+function yyyymmdd(date) {
+    return (date.getFullYear().toString()
+     + '-' + (date.getMonth()<9 ? ('0'+(date.getMonth()+1).toString()) : (date.getMonth()+1).toString())
+      + '-' + (date.getDate()<10 ? ('0' + date.getDate().toString()) : date.getDate().toString()));
+}

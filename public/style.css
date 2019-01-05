@@ -55,9 +55,19 @@ button.blueBg:hover {
 	background-color: #76abe9;
 }
 
+.redBg {
+	background-color: #E82C0C;
+}
+
+button.redBg:hover{
+	background-color: #f07864;
+}
+
 .grayBg {
 	background-color: #9B9B9B;
 }
+
+
 
 .modal{
 	display: none; /* Hidden by default */
@@ -280,13 +290,19 @@ th, td {
 	z-index: -1;
 }
 
-
+/* Modal styles */
 #settleModal {
-	margin: 15% auto;
+	position: absolute;
+	top: calc(50% - 15em);
+	left: calc(50% - 15em);
 	height: 30em;
-	width: 25em;
+	width: 30em;
 	background-color: #ebd7ba;
 	box-shadow: 0 3px 20px #b09671;
+}
+
+#settleModal h4 {
+	padding-left: 2em;
 }
 
 /* Use a media query to add a breakpoint at 600px: */
