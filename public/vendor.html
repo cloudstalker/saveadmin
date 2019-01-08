@@ -86,11 +86,13 @@
 				<div id="requestContent">
 
 				</div>
-				<div>
-					
+				<div id="requestActions">
+					<button id= "akButton" class="button whiteText grayBg">Inform Selected Foodcourt</button>
+					<button id= "resolveButton" class="button whiteText grayBg">Resolve Selected Foodcourt</button>
 				</div>
 			</div>
 		</div>
+		<button id="ctxMenu" class="whiteText redBg" onclick="deleteOneVendorEntry()">Delete</button>
 	</body>
 	
 	
@@ -98,9 +100,11 @@
 	<script src="jQueryRotate.js"></script>
 	<script src="common_layout.js"></script>
 	<script>
+
 		// Looking for vendor requests
 		var vdReqDbRef = firebase.database().ref('/notificationRequests');
 		var modalFcGroup = document.getElementById("requestContent");
+		var reqData = {};
 		vdReqDbRef.on('value', (snapshot) => {
 			var requests = snapshot.val();
 			var vdReqCounter = 0;
@@ -118,11 +122,18 @@
 				vdReqNotif.children[1].innerHTML = vdReqCounter.toString() + " Vendor Request(s)";
 				vdReqNotif.onclick = openSettleModal;
 			}
+			else{
+				var vdReqNotif = document.getElementById('vdReqNotif');
+				vdReqNotif.classList.remove("redBg");
+				vdReqNotif.classList.add("grayBg");
+				vdReqNotif.children[1].innerHTML = "No Vendor Request";
+				vdReqNotif.onclick = null;
+			}
 
-			// Getting foodcourt ID's
-			var reqData = {};
-			vendorDbRef.once('value').then((snapshot)=>{
-				var vendors = snapshot.val();
+			// Getting foodcourt ID's and showing sorted to modal
+			// reqData's data structure is reqData[foodcourtid] = vendorid
+			vendorDbRef.once('value').then((vsnapshot)=>{
+				var vendors = vsnapshot.val();
 				for(var vdId of reqVdId){
 					if(reqData[vendors[vdId]['foodCourtId']] == null){
 						reqData[vendors[vdId]['foodCourtId']] = [];
@@ -135,23 +146,44 @@
 				// Getting foodcourt names
 				firebase.database().ref('/FoodCourt').once('value').then((snapshot)=>{
 					var foodcourts = snapshot.val();
-					for(var fid in reqData){
-						var vdIdFromFid = reqData[fid];
-						var dtl = document.createElement('details');
-						dtl.style.paddingLeft= "2em";
-						var smry = document.createElement('summary');
-						smry.innerHTML = foodcourts[fid]['name'];
-						dtl.appendChild(smry);
-						for(var tempVdId of vdIdFromFid){
-							var ct = document.createElement('p');
-							ct.innerHTML = vendors[tempVdId]['name'];
-							dtl.appendChild(ct);
+					firebase.database().ref('/redeemState').once('value').then((rsnapshot)=>{
+						var rs = rsnapshot.val();
+						for(var fid in reqData){
+							var vdIdFromFid = reqData[fid];
+							var chkbox = document.createElement('input');
+							chkbox.setAttribute('type', 'checkbox');
+							chkbox.id = fid;
+							chkbox.style.marginLeft = "2em";
+							chkbox.onchange = checkedAny;
+							var dtl = document.createElement('details');
+							dtl.id = fid + "details";
+							dtl.style.paddingLeft = "2em";
+							dtl.style.paddingTop = "0.5em";
+							dtl.style.paddingBottom = "0.5em";
+							dtl.style.backgroundColor = "#f7efe3";
+							if(rs[fid] == 1){
+								dtl.style.fontWeight = "800";
+							}
+							var smry = document.createElement('summary');
+							var totalAmountThisFc = 0;
+							for(var tempVdId of vdIdFromFid){
+								var ct = document.createElement('p');
+								ct.innerHTML = vendors[tempVdId]['name'] + ": $"
+								+ vendors[tempVdId]['amountCreditedSinceLastReimbursement'];
+								totalAmountThisFc += Number(vendors[tempVdId]['amountCreditedSinceLastReimbursement']);
+								ct.addEventListener('click', strikeOutVendorEntry, false);
+								dtl.appendChild(ct);
+							}
+							smry.innerHTML = foodcourts[fid]['name'] + ": $" + totalAmountThisFc.toString();
+							dtl.appendChild(smry);
+							modalFcGroup.appendChild(chkbox);
+							modalFcGroup.appendChild(dtl);
 						}
-						modalFcGroup.appendChild(dtl);
-					}
+					})
 				})
 			})
 		})
+
 		// Creating column titles (Semantics)
 		var columns = 
 		["VendorID",
@@ -193,7 +225,8 @@
 		"password"
 		];
 
-		// Entry <-> Semantics Mapping (TODO) Currently Direct
+		// Tracking which vendor entry is clicked
+		var vdClicked = null;
 
 		// Grabbing data & show
 		firebase.auth().onAuthStateChanged(function(user) {
@@ -219,6 +252,8 @@
 						for(var vendor in vendors){
 							var division = document.createElement("DIV");
 							var tr = document.createElement("TR");
+							tr.id = vendor;
+							tr.style.whiteSpace = "noWrap";
 							for (var i = 0; i < columnNumber; i++){
 								var td = document.createElement("TD");
 								if(i == 2){
@@ -247,6 +282,17 @@
 							else{
 								division.className = "vendorRecordFillMore";
 							}
+							
+							// Context Menu for division
+							tr.addEventListener('contextmenu', (event) => {
+								var ctxmenu = document.getElementById("ctxMenu");
+								ctxmenu.style.left = event.pageX + 'px';
+								ctxmenu.style.top = event.pageY + 'px';
+								ctxmenu.style.display = "block";
+								vdClicked = event.currentTarget.id;
+								event.preventDefault();
+							}, false);
+
 							vendorRecordBg.appendChild(division);
 							vendorRecords.appendChild(tr);
 						}
@@ -260,6 +306,10 @@
 			}
 		})
 		
+		// Hiding context menu when clicked
+		document.addEventListener('click', ()=>{
+			document.getElementById("ctxMenu").style.display = "none";
+		})
 
 		// Button Functions
 		var modal = document.getElementsByClassName("modal")[0];
@@ -339,6 +389,142 @@
 				}
 			}
 			fileReader.readAsText(file);
+		}
+
+		// Right click on an entry and delete. Related global variable: vdClicked.
+		function deleteOneVendorEntry(){
+			if(confirm("You are about to delete " + vdClicked)){
+				var update = {};
+				update[vdClicked] = null;
+				vendorDbRef.update(update).catch((e) => {
+					alert(e);
+				})
+				vdClicked = {};
+			}
+			else{
+				vdClicked = {};
+			}
+		}
+
+		// Visual change when there is at least one selected checkbox. Event fires when a checkbox changed state
+		function checkedAny(){
+			var inputs = document.getElementsByTagName('input');
+			var atLeastOneChecked = false;
+			for(var input in inputs){
+				if(inputs[input].type == 'checkbox'){
+					atLeastOneChecked = atLeastOneChecked || inputs[input].checked;
+					// Text color change
+					if(inputs[input].checked){
+						document.getElementById(inputs[input].id + "details").style.color = "red";
+					}
+					else{
+						document.getElementById(inputs[input].id + "details").style.color = "black";
+					}
+				}
+			}
+			// Button color change
+			var akButton = document.getElementById('akButton');
+			var resolveButton = document.getElementById('resolveButton')
+			if(atLeastOneChecked){
+				akButton.classList.remove('grayBg');
+				akButton.classList.add('blueBg');
+				akButton.onclick = achknowledgeSelectedFc;
+				resolveButton.classList.remove('grayBg');
+				resolveButton.classList.add('greenBg');
+				resolveButton.onclick = resolveVendorRequest;
+			}
+			else{
+				akButton.classList.remove('blueBg');
+				akButton.classList.add('grayBg');
+				akButton.onclick = null;
+				resolveButton.classList.remove('greenBg');
+				resolveButton.classList.add('grayBg');
+				resolveButton.onclick = null;
+			}
+		}
+
+		// Letting vendors know that we are coming for them, by foodcourt
+		function achknowledgeSelectedFc(){
+			var inputs = document.getElementsByTagName('input');
+			var rsDbRef = firebase.database().ref('/redeemState');
+			var rsUpdate = new Object();
+			for(var input in inputs){
+				if(inputs[input].type == 'checkbox'){
+					if(inputs[input].checked){
+						rsUpdate[inputs[input].id] = 1;
+					}
+					else{
+						rsUpdate[inputs[input].id] = 0;
+					}
+				}
+			}
+			rsDbRef.update(rsUpdate).catch((error) => {
+				alert(error);
+			})
+		}
+
+		// Crossing out vendors, by click. Not trackable in db.
+		function strikeOutVendorEntry(event){
+			event.currentTarget.style.textDecoration == "none" ? 
+			event.currentTarget.style.textDecoration = "line-through":
+			event.currentTarget.style.textDecoration = "none";
+		}
+
+		// Resolving vendor requests by foodcourt
+		function resolveVendorRequest(){
+			var inputs = document.getElementsByTagName('input');
+			var chkBoxCount = 0;
+			var fcIds = [];
+			for(var input in inputs){
+				if(inputs[input].checked){
+					chkBoxCount += 1;
+					fcIds.push(inputs[input].id);
+				}
+			}
+			if(confirm("You are about to resolve selected " 
+			+ chkBoxCount.toString() + 
+			" foodcourt(s) and corresponding vendors")){
+				var vdIds = [];
+				// Getting vendor id's from reqdata and remove visuals of the requested foodcourt
+				for(var fcId of fcIds){
+					for(var vdId of reqData[fcId]){
+						vdIds.push(vdId);
+					}
+					document.getElementById(fcId).remove();
+					document.getElementById(fcId + "details").remove();
+					var rsUpdate = new Object();
+					rsUpdate[fcId] = 0;
+					rsDbRef.update(rsUpdate).catch((error) => {
+						alert(error);
+					})
+				}
+				// Remove vendor requests & Set vendor's amountSinceLastReimbursement to 0
+				vdReqDbRef.once('value').then((snapshot) => {
+					var requests = snapshot.val();
+					vendorDbRef.once('value').then((vsnapshot) => {
+						var vendors = vsnapshot.val();
+						for(var vdId of vdIds){
+							for(var request in requests){
+								if(requests[request] != null){
+									if(requests[request]['reason'] == "reimburse" 
+									&& requests[request]['sender'] == vdId){
+										// Change objects that will be updated
+										requests[request] = null;
+										vendors[vdId]['amountCreditedSinceLastReimbursement'] = '0';
+									}
+								}
+							}
+						}
+						vendorDbRef.update(vendors);
+						vdReqDbRef.update(requests);
+					})
+					reqData = {};
+				})
+				alert("Resolve success!");
+			}
+			else{
+
+			}
 		}
 
 		// Table scrolling

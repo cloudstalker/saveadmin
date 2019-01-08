@@ -26,9 +26,10 @@
 					<li class="lists"><a href="dashboard.html" class="topLvl whiteText active">Dashboard</a></li>
 				</ul>
 			</div>
-			<div id="statTitle">
+			<div id="statTitle" style="width:100%;">
 				<img src="resources/icons/stat_icon.png"/>
 				<p class="darkGrayText">Statistics</p>
+				<button class="blueBg button whiteText" id="statButton" onclick="openSettleModal()">Custom Graph</button>
 			</div>
 
 			<div class="graphInstance">
@@ -37,6 +38,35 @@
 				</div>
 				<div class="graph" id="firstGraph">
 
+				</div>
+			</div>
+			<div class="modal">
+				<div id="statModal">
+					<h4 class="darkGrayText">Customize Your Graph</h4>
+					<div class="graphOptions">
+						From:
+						<input type="date" name="from">
+						To:
+						<input type="date" name="to">
+					</div>
+					<div class="graphOptions">
+						<input type="checkbox" name="userBase">
+						User Base&nbsp;
+						<input type="checkbox" name="redeemedStickers">
+						Redeemed Stickers by
+						<select>
+							<option value="foodcourt">Foodcourt</option>
+							<option value="vendor">Vendor</option>
+						</select>&nbsp;
+						<input type="checkbox" name="generatedStickers">
+						Generated Stickers
+					</div>
+					<div id="drawButton">
+						<button class="button grayBg whiteText">Draw my graph</button>
+					</div>
+					<div class="graph" id="customGraph">
+						Graph will appear here when you draw the graph
+					</div>
 				</div>
 			</div>
 		</div>
@@ -109,5 +139,17 @@
 			{xaxis: {type: 'date', title: "Date"}, yaxis: {title: "User Sign-ups"},
 				margin: { t: 0 } } );
 		})
+
+		// Button functions
+		var modal = document.getElementsByClassName("modal")[0];
+		function openSettleModal(){
+			modal.style.display = "block";
+		}
+
+		window.onclick = function(event){
+			if (event.target == modal) {
+				modal.style.display = "none";
+			}
+		}
 	</script>
 </html>
