@@ -65,7 +65,6 @@
 						<select id="selectFc" disabled="true" onchange="fcSelected()">
 							<option value="toSelect">All</option>
 						</select>
-						<button class="tag purpleBg whiteText">Fine Food</button>
 					</div>
 					<div class="graphOptions hiddenOptions">
 						<input type="checkbox" name="vd" disabled="true" onchange="vdChecked()">
@@ -143,14 +142,53 @@
 			}
 		})
 
-		// Add a foodcourt into the dataset
+		// Add a foodcourt into the dataset. Does not include "All".
 		function fcSelected(){
-
+			var fcSelect = document.getElementById("selectFc");
+			var fcSelected = fcSelect.children[fcSelect.selectedIndex];
+			if(fcSelected.value != "toSelect"){
+				var tag = document.createElement("button");
+				tag.classList.add("tag");
+				tag.classList.add("whiteText");
+				tag.classList.add("purpleBg");
+				tag.name = fcSelect.value;
+				tag.innerHTML = fcSelected.innerHTML;
+				fcSelect.parentElement.appendChild(tag);
+				advancedOptions["foodcourts"].push(fcSelected.value);
+				tag.onclick = tagClicked;
+			}
+			else{
+				var fcSelectParent = fcSelect.parentElement;
+				var tags = fcSelectParent.getElementsByTagName("button");
+				for(var tag in tags){
+					fcSelectParent.removeChild(tags[tag]);
+				}
+				advancedOptions["foodcourts"] = [];
+			}
 		}
 
 		// Add a vendor into the dataset
 		function vdSelected(){
 
+		}
+
+		// Remove tag and corresponding entry in advancedOptions
+		function tagClicked(e){
+			if(e.target.classList.contains("purpleBg")){
+				var ind = advancedOptions["foodcourts"].indexOf(e.target.name);
+				if(ind !== -1) advancedOptions["foodcourts"].splice(ind, 1);
+			}
+			else{
+				if(e.target.classList.contains("darkBlueBg")){
+					var ind = advancedOptions["vendors"].indexOf(e.target.name);
+					if(ind !== -1) advancedOptions["vendors"].splice(ind, 1);
+				}
+			}
+			var tagParent = e.target.parentElement;
+			tagParent.removeChild(e.target);
+			if(tagParent.getElementsByTagName("button").length === 0){
+				document.getElementById("selectFc").selectedIndex = 0;
+			}
 		}
 
 		stuDbRef.once('value').then((snapshot)=>{

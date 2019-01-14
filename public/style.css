@@ -81,7 +81,7 @@ button.redBg:hover{
 	position: absolute;
 	top: 0; right: 0;
 	border-top: 1em solid #f7efe3;
-	border-bottom: 1em solid #f7efe3;
+	border-bottom: 1.05em solid #f7efe3;
 	border-left: 1em solid #a167a5;
 	transition-duration: 0.4s;
 }
@@ -92,7 +92,7 @@ button.redBg:hover{
 	position: absolute;
 	top: 0; right: 0;
 	border-top: 1em solid #f7efe3;
-	border-bottom: 1em solid #f7efe3;
+	border-bottom: 1.05em solid #f7efe3;
 	border-left: 1em solid #cbaccd;
 }
 
@@ -105,7 +105,7 @@ button.redBg:hover{
 	position: absolute;
 	top: 0; right: 0;
 	border-top: 1em solid #f7efe3;
-	border-bottom: 1em solid #f7efe3;
+	border-bottom: 1.05em solid #f7efe3;
 	border-left: 1em solid #4f6171;
 	transition-duration: 0.4s;
 }
@@ -119,7 +119,7 @@ button.redBg:hover{
 	position: absolute;
 	top: 0; right: 0;
 	border-top: 1em solid #f7efe3;
-	border-bottom: 1em solid #f7efe3;
+	border-bottom: 1.05em solid #f7efe3;
 	border-left: 1em solid #bdc4c9;
 	transition-duration: 0.4s;
 }
