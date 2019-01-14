@@ -67,7 +67,62 @@ button.redBg:hover{
 	background-color: #9B9B9B;
 }
 
+.purpleBg {
+	background-color: #a167a5;
+	position: relative;
+}
 
+.purpleBg:hover {
+	background-color: #cbaccd;
+}
+
+.purpleBg:before {
+	content: "";
+	position: absolute;
+	top: 0; right: 0;
+	border-top: 1em solid #f7efe3;
+	border-bottom: 1em solid #f7efe3;
+	border-left: 1em solid #a167a5;
+	transition-duration: 0.4s;
+}
+
+.purpleBg:hover:before {
+	background-color: #cbaccd;
+	content: "";
+	position: absolute;
+	top: 0; right: 0;
+	border-top: 1em solid #f7efe3;
+	border-bottom: 1em solid #f7efe3;
+	border-left: 1em solid #cbaccd;
+}
+
+.darkBlueBg {
+	background-color: #4f6171;
+}
+
+.darkBlueBg:before {
+	content: "";
+	position: absolute;
+	top: 0; right: 0;
+	border-top: 1em solid #f7efe3;
+	border-bottom: 1em solid #f7efe3;
+	border-left: 1em solid #4f6171;
+	transition-duration: 0.4s;
+}
+
+.darkBlueBg:hover {
+	background-color: #bdc4c9;
+}
+
+.darkBlueBg:hover:before {
+	content: "";
+	position: absolute;
+	top: 0; right: 0;
+	border-top: 1em solid #f7efe3;
+	border-bottom: 1em solid #f7efe3;
+	border-left: 1em solid #bdc4c9;
+	transition-duration: 0.4s;
+}
 
 .modal{
 	display: none; /* Hidden by default */
@@ -318,12 +373,10 @@ th, td {
 
 #statModal {
 	position: absolute;
-	display: flex;
-	flex-direction: column;
 	top: calc(50% - 20em);
 	left: calc(50% - 20em);
-	height: 40em;
 	width: 40em;
+	margin-bottom: 5em;
 	background-color: #ebd7ba;
 	box-shadow: 0 3px 20px #b09671;
 }
@@ -338,6 +391,11 @@ th, td {
 	padding-bottom: 0.75em;
 	font-size: 75%;
 	background-color: #f7efe3;
+	overflow: auto
+}
+
+.hiddenOptions {
+	display: none;
 }
 
 #statButton{
@@ -355,14 +413,26 @@ th, td {
 	align-items: center;
 }
 
+.tag {
+	height: 2em;
+	width: auto;
+	margin-left: 1em;
+	padding-left: 1em;
+	padding-right: 2em;
+	border: none;
+	transition-duration: 0.4s;
+	cursor: pointer;
+	font-size: 85%;
+}
+
 #customGraph {
 	background-color: #f7efe3;
 	color: #b09671;
 	font-size: 120%;
 	width: 100%;
+	height: 22em;
 	text-align: center;
 	line-height: 22em;
-	flex: 1;
 }
 /* Context menu */
 #ctxMenu{

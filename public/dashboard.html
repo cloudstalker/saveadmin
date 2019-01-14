@@ -29,7 +29,7 @@
 			<div id="statTitle" style="width:100%;">
 				<img src="resources/icons/stat_icon.png"/>
 				<p class="darkGrayText">Statistics</p>
-				<button class="blueBg button whiteText" id="statButton" onclick="openSettleModal()">Custom Graph</button>
+				<button class="blueBg button whiteText" id="statButton" onclick="openGraphModal()">Custom Graph</button>
 			</div>
 
 			<div class="graphInstance">
@@ -44,22 +44,40 @@
 				<div id="statModal">
 					<h4 class="darkGrayText">Customize Your Graph</h4>
 					<div class="graphOptions">
-						From:
-						<input type="date" name="from">
-						To:
+						<b>From:</b>&nbsp;
+						<input type="date" name="from">&nbsp;
+						<b>To:</b>&nbsp;
 						<input type="date" name="to">
 					</div>
 					<div class="graphOptions">
-						<input type="checkbox" name="userBase">
+						<b>Analyze:</b>&nbsp;
+						<input type="checkbox" name="userBase" onchange="checkedAny()">
 						User Base&nbsp;
-						<input type="checkbox" name="redeemedStickers">
-						Redeemed Stickers by
-						<select>
-							<option value="foodcourt">Foodcourt</option>
-							<option value="vendor">Vendor</option>
-						</select>&nbsp;
-						<input type="checkbox" name="generatedStickers">
-						Generated Stickers
+						<input type="checkbox" name="generatedStickers" onchange="checkedAny()">
+						Generated Stickers&nbsp;
+						<input type="checkbox" name="redeemedStickers" onchange="checkedAny()">
+						Redeemed Stickers
+					</div>
+					<div class="graphOptions hiddenOptions">
+						<p style="margin-top: 0"><b>By:</b></p>
+						<input type="checkbox" name="fc" onchange="fcChecked()">
+						Foodcourts&nbsp;
+						<select id="selectFc" disabled="true" onchange="fcSelected()">
+							<option value="toSelect">All</option>
+						</select>
+						<button class="tag purpleBg whiteText">Fine Food</button>
+					</div>
+					<div class="graphOptions hiddenOptions">
+						<input type="checkbox" name="vd" disabled="true" onchange="vdChecked()">
+						Vendors&nbsp;
+						<input type="checkbox" name="hide" disabled="true">
+						Hide Foodcourt Plot&nbsp;
+						<select id="selectVd" disabled="true" onchange="vdSelected()">
+							<option value="toSelect">All</option>
+						</select>
+						<div>
+
+						</div>
 					</div>
 					<div id="drawButton">
 						<button class="button grayBg whiteText">Draw my graph</button>
@@ -105,6 +123,35 @@
 		});
 
 		var stuDbRef = firebase.database().ref('/User/Student');
+		var fcDbRef = firebase.database().ref('/FoodCourt');
+		var inputs = document.getElementsByTagName('input');
+		var advancedOptions = {
+			foodcourts: [],
+			vendors: [],
+			showFc: null
+		}
+
+		// Update foodcourts in custom graph options
+		fcDbRef.once('value').then((snapshot)=>{
+			var foodcourts = snapshot.val();
+			var selectFc = document.getElementById("selectFc");
+			for(var foodcourt in foodcourts){
+				var selectOption = document.createElement('option');
+				selectOption.value = foodcourt;
+				selectOption.innerHTML = foodcourts[foodcourt]['name'];
+				selectFc.appendChild(selectOption);
+			}
+		})
+
+		// Add a foodcourt into the dataset
+		function fcSelected(){
+
+		}
+
+		// Add a vendor into the dataset
+		function vdSelected(){
+
+		}
 
 		stuDbRef.once('value').then((snapshot)=>{
 			var students = snapshot.val();
@@ -134,7 +181,6 @@
 			trace['x'] = dates;
 			trace['y'] = counts;
 			trace['mode'] = 'lines';
-			console.log(trace);
 			Plotly.plot(graph1, [trace], 
 			{xaxis: {type: 'date', title: "Date"}, yaxis: {title: "User Sign-ups"},
 				margin: { t: 0 } } );
@@ -142,13 +188,161 @@
 
 		// Button functions
 		var modal = document.getElementsByClassName("modal")[0];
-		function openSettleModal(){
+		function openGraphModal(){
 			modal.style.display = "block";
 		}
 
 		window.onclick = function(event){
 			if (event.target == modal) {
 				modal.style.display = "none";
+			}
+		}
+
+		// Visual change when there is at least one selected checkbox. Event fires when a checkbox changed state. 
+		// Different from vendor.html
+		function checkedAny(){
+			var atLeastOneChecked = false;
+			var advancedOptionChecked = false;
+			for(var input in inputs){
+				if(inputs[input].type == 'checkbox'){
+					atLeastOneChecked = atLeastOneChecked || inputs[input].checked;
+					if(inputs[input].name == "generatedStickers" || inputs[input].name == "redeemedStickers"){
+						advancedOptionChecked = advancedOptionChecked || inputs[input].checked;
+					}
+				}
+			}
+
+			// Button color change
+			var drButton = document.getElementById("drawButton").children[0];
+			if(atLeastOneChecked){
+				drButton.classList.remove('grayBg');
+				drButton.classList.add('blueBg');
+				drButton.onclick = drawGraph;
+			}
+			else{
+				drButton.classList.remove('blueBg');
+				drButton.classList.add('grayBg');
+				drButton.onclick = null;
+			}
+
+			// Show advanced options
+			var advOptions = document.getElementsByClassName("hiddenOptions");
+			if(advancedOptionChecked){
+				advOptions[0].style.display = "block";
+				advOptions[1].style.display = "block";
+			}
+			else{
+				advOptions[0].style.display = "none";
+				advOptions[1].style.display = "none";
+			}
+		}
+
+		// Enable secondary options
+		function fcChecked(){
+			var selects = document.getElementsByTagName("select");
+			if(inputs[5].checked){
+				inputs[6].disabled = false;
+				selects[0].disabled = false;
+			}
+			else{
+				inputs[6].disabled = true;
+				selects[0].disabled = true;
+			}
+		}
+
+		function vdChecked(){
+			var selects = document.getElementsByTagName("select");
+			if(inputs[6].checked){
+				inputs[7].disabled = false;
+				selects[1].disabled = false;
+			}
+			else{
+				inputs[7].disabled = true;
+				selects[1].disabled = true;
+			}
+		}
+
+		// Draw the graphs according to specified options
+		function drawGraph(){
+			var fromDate = new Date(inputs[0]);
+			var toDate = new Date(inputs[1]);
+			var userChkBox = inputs[2];
+			var gsChkBox = inputs[3];
+			var rsChkBox = inputs[4];
+			var rsSelect = document.getElementById("selectFc");
+			
+			// Initial checks
+			if(rsChkBox.checked){
+				if(rsSelect.selectedIndex == 0){
+					alert("Select a foodcourt to analyze redeemed stickers");
+					return;
+				}
+			}
+			if(fromDate < toDate){
+
+			}
+			else{
+				alert("From Date must be smaller!");
+				return;
+			}
+
+			// Preparing data
+			var data = [];
+			var trace = new Object();
+			trace['x'] = [];
+			trace['y'] = [];
+			trace['mode'] = 'lines';
+			var interDate = fromDate;
+			while(interDate <= toDate){
+				trace['x'].push(yyyymmdd(interDate));
+				interDate = new Date(interDate.getTime() + 60*60*24*1000);
+			}
+			var trace2 = trace;
+			var trace3 = trace;
+
+			// Pushing user base statistics according to date duration
+			if(userChkBox.checked){
+				stuDbRef.once('value').then((snapshot)=>{
+					var students = snapshot.val();
+					for(var i = 0; i< trace['x'].length; i++){
+						trace['y'].push(0);
+					}
+					for(var student in students){
+						var dateOfSignUp = students[student]['signUpDate'];
+						var jsDateOfSignUp = new Date(dateOfSignUp);
+						if(jsDateOfSignUp >= fromDate && jsDateOfSignUp <= toDate){
+							trace['y'][trace['x'].indexOf(yyyymmdd(jsDateOfSignUp))] += 1;
+						}
+					}
+					trace['name'] = "User Base";
+					data.push(trace);
+				})
+			}
+			
+			// Pushing generated & redeemed statistics data according to date duration
+			if(gsChkBox.checked || rsChkBox.checked){
+				var fcChkBox = inputs[5];
+				var vdChkBox = inputs[6];
+				var hideChkBox = inputs[7];
+				firebase.database().ref("/Sticker").once('value').then((ssnapshot)=>{
+					if(fcChkBox.checked){
+						if(vdChkBox.checked){
+							if(hideChkBox.checked){ // Showing specified foodcourts, specified vendors, hiding foodcourts
+
+							}
+							else{ // Showing specified foodcourts, specified vendors, not hiding foodcourts
+
+							}
+						}
+						else{ // Showing specified foodcourts, no vendors
+
+						}
+					}
+					else{ // Showing all foodcourts plus total amount
+
+					}
+				})
+				
 			}
 		}
 	</script>
