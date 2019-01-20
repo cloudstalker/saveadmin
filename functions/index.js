@@ -8,7 +8,7 @@ adminInstance.initializeApp({
 });
 
 // Getting Login Info & Giving custom tokens back to the client
-exports.getToken = functions.region('asia-northeast1').https.onCall((data, context) => {
+exports.getToken = functions.https.onCall((data, context) => {
     const username = data["username"];
     const password = data["password"];
     return adminInstance.database().ref('/User/Admin').once('value')
@@ -52,4 +52,31 @@ exports.getToken = functions.region('asia-northeast1').https.onCall((data, conte
         console.log("error: " + error);
     })
     
+});
+
+// Change user name and password
+exports.changeCredential = functions.https.onCall((data, context) => {
+    const username = data["username"];
+    const password = data["password"];
+    var adminDbRef = adminInstance.database().ref('/User/Admin');
+    return adminDbRef.once('value')
+    .then(function(snapshot)
+    {
+        admins = snapshot.val();
+        var rightCred = false;
+        var adminId = "AD12345";
+        // Single admin account implementation
+        var newAdminObj = new Object();
+        newAdminObj["username"] = username;
+        newAdminObj["password"] = password;
+        newAdminObj["id"] = adminId;
+        var update = new Object();
+        update[adminId] = newAdminObj;
+        return adminDbRef.update(update).catch(error => {
+            console.log("error: " + error);
+        })
+    })
+    .catch(error => {
+        console.log("error: " + error);
+    })
 });

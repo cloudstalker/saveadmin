@@ -10,7 +10,7 @@
         <div style="margin: 5em auto; width: 20em; height: 13em; padding: 1em 1em; background-color: #f7efe3; border-radius: 2em">
             <h2 style="color: #4A4A4A; margin-bottom: 1em; margin-top: 0" align="center">Admin Login</h2>
             <input id="userName" type="text" placeholder="Username" style="margin: 1em auto; display: block"/>
-            <input id="password" type="password" placeholder="Password" onkeyup="enterToSignIn()" style="margin: 1em auto; display: block"/>
+            <input id="password" type="password" placeholder="Password" style="margin: 1em auto; display: block"/>
             <button class="button greenBg whiteText" style="margin:2em auto; display: block" onclick="signIn()">Sign in</button>
             <div id="wrongCredential" class="redText" style="text-align: center; display: none; margin-top: 0.5em">Wrong user name or password</div>
         </div>
@@ -40,33 +40,32 @@
             firebase.initializeApp(config);
 
             function signIn(){
-                var functions = firebase.app().functions('asia-northeast1');
+                var functions = firebase.functions();
                 var getToken = functions.httpsCallable('getToken');
                 var modal = document.getElementsByClassName("modal")[0];
                 modal.style.display = "block";
                 document.getElementById("wrongCredential").style.display = "none";
                 getToken({username: document.getElementById("userName").value,
-                        password: document.getElementById("password").value}).then(function(result){
-                            if(result.data.token != "null"){
-                                firebase.auth().signInWithCustomToken(result.data.token)
-                                .then(() => {
-                                    window.location.href = "dashboard.html";
-                                })
-                                .catch(function(error) {
-                                    // Handle Errors here.
-                                    var errorCode = error.code;
-                                    var errorMessage = error.message;
-                                    alert(error.code + error.message);
-                                    modal.style.display = "none";
-                                });
-                                
-                            }
-                            else{
-                                modal.style.display = "none";
-                                document.getElementById("wrongCredential").style.display = "block";
-                            }
+                password: document.getElementById("password").value}).then(function(result){
+                    if(result.data.token != "null"){
+                        firebase.auth().signInWithCustomToken(result.data.token)
+                        .then(() => {
+                            window.location.href = "dashboard.html";
+                        })
+                        .catch(function(error) {
+                            // Handle Errors here.
+                            var errorCode = error.code;
+                            var errorMessage = error.message;
+                            alert(error.code + error.message);
+                            modal.style.display = "none";
+                        });
+                        
                     }
-                )
+                    else{
+                        modal.style.display = "none";
+                        document.getElementById("wrongCredential").style.display = "block";
+                    }
+                })
             }
             
             var textField = document.getElementById("password");

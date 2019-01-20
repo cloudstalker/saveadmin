@@ -27,6 +27,7 @@
 			};
 			firebase.initializeApp(config);
 			var vendorDbRef = firebase.database().ref('/User/Vendor/');
+			var foodCourtDbRef = firebase.database().ref('/FoodCourt');
 
 		</script>	
 		<div id="pageContainer">
@@ -36,12 +37,12 @@
 					<img src="resources/icons/menu_icon.png" id="menuButtonImg" onclick="menuClicked()"/>
 				</div>
 				<ul>
-					<li class="lists"><a href="settings.html" class="topLvl whiteText">Settings</a></li>
+					<li class="lists"><a href="signout.html" class="topLvl whiteText">Sign Out</a></li>
 					<li class="lists dropdown">
 						<a class="whiteText topLvl active">Manage Accounts</a>
 						<div class="dropdownContent">
 							<a href="vendor.html">Vendor Accounts</a>
-							<a>Admin Accounts</a>
+							<a href="admin.html">Admin Accounts</a>
 						</div>
 					</li>
 					<li class="lists"><a href="dashboard.html" class="topLvl whiteText">Dashboard</a></li>
@@ -103,6 +104,7 @@
 
 		// Looking for vendor requests
 		var vdReqDbRef = firebase.database().ref('/notificationRequests');
+		
 		var modalFcGroup = document.getElementById("requestContent");
 		var reqData = {};
 		vdReqDbRef.on('value', (snapshot) => {
@@ -232,7 +234,6 @@
 		firebase.auth().onAuthStateChanged(function(user) {
 			if (user) {
 				// signed in
-				var foodCourtDbRef = firebase.database().ref('/FoodCourt');
 				vendorDbRef.on('value', function(vsnapshot){
 					var vendors = vsnapshot.val();
 					foodCourtDbRef.once('value').then((fsnapshot) => {
@@ -379,10 +380,18 @@
 						for(var i = 0; i < columnNumber; i++){
 							tempObj[vendorEntries[i]] = tempArr[i];
 						}
-						tempObj["password"] == "" ? tempObj["password"] = Math.round(100000000 * Math.random()): null;
-						var update = new Object();
-						update[tempObj["id"]] = tempObj;
-						vendorDbRef.update(update).catch((error) => {
+						tempObj["password"] == "" ? tempObj["password"] = Math.round(100000000 * Math.random()): 0;
+						tempObj["amountCredited"] == "" ? tempObj["amountCredited"] = 0: 0;
+						tempObj["amountCreditedSinceLastReimbursement"] == "" ? tempObj["amountCreamountCreditedSinceLastReimbursementdited"] = 0: 0;
+						tempObj["totalStickerAdded"] == "" ? tempObj["totalStickerAdded"] = 0: 0;
+						tempObj["totalStickerRedeemed"] == "" ? tempObj["totalStickerRedeemed"] = 0: 0;
+						// var fcupdate = new Object();
+						var vdupdate = new Object();
+						vdupdate[tempObj["id"]] = tempObj;
+						// foodCourtDbRef.update(fcupdate).catch((error) => {
+						// 	alert("updating foodcourts:" + error);
+						// })
+						vendorDbRef.update(vdupdate).catch((error) => {
 							alert(error);
 							});
 					}

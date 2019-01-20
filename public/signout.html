@@ -24,15 +24,30 @@
   </head>
   <body>
     <div id="message">
-      <h2>404</h2>
-      <h1>Page Not Found</h1>
-      <p>Trespassing into alien territory!</p>
-      <button class="button greenBg whiteText" style="margin: 0 auto; display: block" onclick="goBack()">Bring Me Back</button>
+      <h2>Please wait...</h2>
+      <h1>Signing you out</h1>
+      <p>Random flavor message here</p>
+      
     </div>
+    <script src="https://www.gstatic.com/firebasejs/5.7.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.7.0/firebase-auth.js"></script>
     <script>
-      function goBack(){
-        window.location.href = "dashboard.html";
-      }
+        // Initialize Firebase
+        var config = {
+                apiKey: "AIzaSyD_8xDR6m1kA5Xg3YDmbbEsKdxM8HpP-44",
+                authDomain: "nussave-app.firebaseapp.com",
+                databaseURL: "https://nussave-app.firebaseio.com",
+                projectId: "nussave-app",
+                storageBucket: "nussave-app.appspot.com",
+                messagingSenderId: "770570652465"
+            };
+        firebase.initializeApp(config);
+        // Sign out
+        firebase.auth().signOut().then(function() {
+            window.location.href = "index.html";
+        }).catch(function(error) {
+            alert(error);
+        });
     </script>
   </body>
 </html>

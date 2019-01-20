@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Admin Log In</title>
+        <link rel="stylesheet" type="text/css" href="style.css">
+        <meta name="theme-color" content="#63ab5b" />
+    </head>
+    <body>
+        <div style="margin: 5em auto; width: 20em; height: 13em; padding: 1em 1em; background-color: #f7efe3; border-radius: 2em">
+            <h2 style="color: #4A4A4A; margin-bottom: 1em; margin-top: 0" align="center">Admin Login</h2>
+            <input id="userName" type="text" placeholder="New Username" style="margin: 1em auto; display: block"/>
+            <input id="password" type="password" placeholder="New Password" style="margin: 1em auto; display: block"/>
+            <input id="passwordConfirm" type="password" placeholder="Repeat Password" style="margin: 1em auto; display: block"/>
+            <button class="button greenBg whiteText" style="margin:2em auto; display: block" onclick="changeCred()">Change</button>
+            <div id="wrongCredential" class="redText" style="text-align: center; display: none; margin-top: 0.5em">Passwords not a match</div>
+        </div>
+        <div class="modal">
+            <div id="logInModal" style="position: absolute; width: 20em; height: 5em;
+             background-color:honeydew; left: calc(50% - 10em); top: calc(50% - 2.5em);
+             display: flex; justify-content: center; align-items: center">
+                Changing password and logging you back in...
+            </div>
+        </div>
+
+        <script src="https://www.gstatic.com/firebasejs/5.7.0/firebase-app.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/5.7.0/firebase-auth.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/5.7.0/firebase-functions.js"></script>
+        <script src="common_backend.js"></script>
+        <script>
+            // Initialize Firebase
+            var config = {
+                apiKey: "AIzaSyD_8xDR6m1kA5Xg3YDmbbEsKdxM8HpP-44",
+                authDomain: "nussave-app.firebaseapp.com",
+                databaseURL: "https://nussave-app.firebaseio.com",
+                projectId: "nussave-app",
+                storageBucket: "nussave-app.appspot.com",
+                messagingSenderId: "770570652465"
+            };
+            firebase.initializeApp(config);
+            firebase.auth().onAuthStateChanged(function(user) {
+			if (user) {
+                
+            }
+            else {
+                    // No user is signed in.
+                    alert("Sign in first!");
+                    window.location.href = "index.html";
+                }
+            })
+
+            function changeCred(){
+                if(document.getElementById("password").value === document.getElementById("passwordConfirm").value){
+                    var functions = firebase.functions();
+                    var changeCredential = functions.httpsCallable('changeCredential');
+                    var getToken = functions.httpsCallable('getToken');
+                    var modal = document.getElementsByClassName("modal")[0];
+                    modal.style.display = "block";
+                    document.getElementById("wrongCredential").style.display = "none";
+                    changeCredential({username: document.getElementById("userName").value,
+                            password: document.getElementById("password").value}).then(() =>{
+                        getToken({username: document.getElementById("userName").value,
+                        password: document.getElementById("password").value}).then(function(result){
+                            if(result.data.token != "null"){
+                                firebase.auth().signInWithCustomToken(result.data.token)
+                                .then(() => {
+                                    window.location.href = "dashboard.html";
+                                })
+                                .catch(function(error) {
+                                    // Handle Errors here.
+                                    var errorCode = error.code;
+                                    var errorMessage = error.message;
+                                    alert(error.code + error.message);
+                                });
+                            }
+                            else{
+                                console.log("Credential not a match");
+                            }
+                        })
+                    }).catch(error => {
+                        // Handle Errors here.
+                        var errorCode = error.code;
+                        var errorMessage = error.message;
+                        alert(error.code + error.message);
+                    })
+                }
+                else{
+                    document.getElementById("wrongCredential").style.display = "block";
+                }
+            }
+            
+            var textField = document.getElementById("password");
+            textField.onkeyup = function(e){
+                if(e.keyCode == 13 || e.which == 13){
+                    changeCred();
+                }
+            } 
+        </script>
+    </body>
+</html>

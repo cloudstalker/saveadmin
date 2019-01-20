@@ -38,3 +38,22 @@ function yyyymmdd(date) {
      + '-' + (date.getMonth()<9 ? ('0'+(date.getMonth()+1).toString()) : (date.getMonth()+1).toString())
       + '-' + (date.getDate()<10 ? ('0' + date.getDate().toString()) : date.getDate().toString()));
 }
+
+// Trace class
+class Trace{
+    constructor(fromDate, toDate, mode){
+        this.x = [];
+        this.y = [];
+        this.name = '';
+        this.id = '';
+        this.mode = mode;
+        var interDate = fromDate;
+        while(interDate <= toDate){
+            this.x.push(yyyymmdd(interDate));
+            interDate = new Date(interDate.getTime() + 60*60*24*1000);
+        }
+        for(var i = 0; i< this.x.length; i++){
+            this.y.push(0);
+        }
+    }
+}

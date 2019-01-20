@@ -15,12 +15,12 @@
 					<img src="resources/icons/menu_icon.png" id="menuButtonImg" onclick="menuClicked()"/>
 				</div>
 				<ul>
-					<li class="lists"><a href="settings.html" class="topLvl whiteText">Settings</a></li>
+					<li class="lists"><a href="signout.html" class="topLvl whiteText">Sign Out</a></li>
 					<li class="lists dropdown">
 						<a class="whiteText topLvl">Manage Accounts</a>
 						<div class="dropdownContent">
 							<a href="vendor.html">Vendor Accounts</a>
-							<a>Admin Accounts</a>
+							<a href="admin.html">Admin Accounts</a>
 						</div>
 					</li>
 					<li class="lists"><a href="dashboard.html" class="topLvl whiteText active">Dashboard</a></li>
@@ -66,7 +66,7 @@
 							<option value="toSelect">All</option>
 						</select>
 					</div>
-					<div class="graphOptions hiddenOptions">
+					<div class="graphOptions hiddenOptions" id="vdOptions">
 						<input type="checkbox" name="vd" disabled="true" onchange="vdChecked()">
 						Vendors&nbsp;
 						<input type="checkbox" name="hide" disabled="true">
@@ -74,9 +74,6 @@
 						<select id="selectVd" disabled="true" onchange="vdSelected()">
 							<option value="toSelect">All</option>
 						</select>
-						<div>
-
-						</div>
 					</div>
 					<div id="drawButton">
 						<button class="button grayBg whiteText">Draw my graph</button>
@@ -122,46 +119,72 @@
 		});
 
 		var stuDbRef = firebase.database().ref('/User/Student');
+		var vdDbRef = firebase.database().ref('/User/Vendor');
 		var fcDbRef = firebase.database().ref('/FoodCourt');
 		var inputs = document.getElementsByTagName('input');
 		var advancedOptions = {
 			foodcourts: [],
 			vendors: [],
-			showFc: null
+			vendorsFull: []
 		}
+		// Keep the grabbed data which likely not change during a session
+		var foodcourts;
+		var vendors;
+		var students;
+		var stickers;
+		vdDbRef.once('value').then((snapshot)=>{
+			vendors = snapshot.val();
+		})
+		firebase.database().ref("/Sticker").once('value').then((ssnapshot)=>{
+			stickers = ssnapshot.val();
+		});
+		fcDbRef.once('value').then((snapshot)=>{
+			foodcourts = snapshot.val();
+		})
 
 		// Update foodcourts in custom graph options
-		fcDbRef.once('value').then((snapshot)=>{
-			var foodcourts = snapshot.val();
-			var selectFc = document.getElementById("selectFc");
-			for(var foodcourt in foodcourts){
-				var selectOption = document.createElement('option');
-				selectOption.value = foodcourt;
-				selectOption.innerHTML = foodcourts[foodcourt]['name'];
-				selectFc.appendChild(selectOption);
-			}
-		})
+		var selectFc = document.getElementById("selectFc");
+		for(var foodcourt in foodcourts){
+			var selectOption = document.createElement('option');
+			selectOption.value = foodcourt;
+			selectOption.innerHTML = foodcourts[foodcourt]['name'];
+			selectFc.appendChild(selectOption);
+		}
 
 		// Add a foodcourt into the dataset. Does not include "All".
 		function fcSelected(){
 			var fcSelect = document.getElementById("selectFc");
 			var fcSelected = fcSelect.children[fcSelect.selectedIndex];
+			var vdSelect = document.getElementById("selectVd");
 			if(fcSelected.value != "toSelect"){
-				var tag = document.createElement("button");
-				tag.classList.add("tag");
-				tag.classList.add("whiteText");
-				tag.classList.add("purpleBg");
-				tag.name = fcSelect.value;
-				tag.innerHTML = fcSelected.innerHTML;
-				fcSelect.parentElement.appendChild(tag);
-				advancedOptions["foodcourts"].push(fcSelected.value);
-				tag.onclick = tagClicked;
+				if(advancedOptions["foodcourts"].indexOf(fcSelected.value) == -1){
+					for(var vendor in vendors){
+						if(vendors[vendor]["foodCourtId"] == fcSelected.value){
+							var selectOption = document.createElement('option');
+							selectOption.value = vendor + "@" + fcSelected.value;
+							selectOption.innerHTML = vendors[vendor]["name"] + "@" + fcSelected.innerHTML;
+							vdSelect.appendChild(selectOption);
+						}
+					}
+					var tag = document.createElement("button");
+					tag.classList.add("tag");
+					tag.classList.add("whiteText");
+					tag.classList.add("purpleBg");
+					tag.name = fcSelected.value;
+					tag.innerHTML = fcSelected.innerHTML;
+					fcSelect.parentElement.appendChild(tag);
+					advancedOptions["foodcourts"].push(fcSelected.value);
+					tag.onclick = tagClicked;
+				}
 			}
 			else{
 				var fcSelectParent = fcSelect.parentElement;
 				var tags = fcSelectParent.getElementsByTagName("button");
-				for(var tag in tags){
-					fcSelectParent.removeChild(tags[tag]);
+				for(var i = 0; i < tags.length; i++){
+					var eve = new Object();
+					eve["target"] = tags[i];
+					tags[i].click(eve);  // Odin came to me just now...
+					i -= 1;              // see below similar situation like this...
 				}
 				advancedOptions["foodcourts"] = [];
 			}
@@ -169,30 +192,81 @@
 
 		// Add a vendor into the dataset
 		function vdSelected(){
-
+			var vdSelect = document.getElementById("selectVd");
+			console.log("a different vendor selected");
+			var vdSelectedOp = vdSelect.children[vdSelect.selectedIndex];
+			if(vdSelectedOp.value != "toSelect"){
+				if(advancedOptions["vendors"].indexOf(vdSelectedOp.value) == -1){
+					var tag = document.createElement("button");
+					tag.classList.add("tag");
+					tag.classList.add("whiteText");
+					tag.classList.add("darkBlueBg");
+					tag.name = vdSelect.value;
+					tag.innerHTML = vdSelectedOp.innerHTML;
+					vdSelect.parentElement.appendChild(tag);
+					advancedOptions["vendors"].push(vdSelectedOp.value);
+					tag.onclick = tagClicked;
+				}
+			}
+			else{
+				var vdSelectParent = vdSelect.parentElement;
+				var tags = vdSelectParent.getElementsByTagName("button");
+				for(var tag in tags){
+					vdSelectParent.removeChild(tags[tag]);
+					
+				}
+				advancedOptions["vendors"] = [];
+			}
 		}
 
 		// Remove tag and corresponding entry in advancedOptions
 		function tagClicked(e){
+			var tagParent = e.target.parentElement;
+			tagParent.removeChild(e.target);
+			var vdDiv = document.getElementById("vdOptions");
+			var vdSelect = document.getElementById("selectVd");
+			console.log(vdSelect);	// ridiculously affected by later code (removeChild to be exact)
 			if(e.target.classList.contains("purpleBg")){
 				var ind = advancedOptions["foodcourts"].indexOf(e.target.name);
 				if(ind !== -1) advancedOptions["foodcourts"].splice(ind, 1);
+				if(tagParent.getElementsByTagName("button").length === 0){
+					document.getElementById("selectFc").selectedIndex = 0;
+				}
+				// Also delete corresponding vendor entries, options and tags
+				var vdSelectOps = vdSelect.children;
+				for(var i = 1; i < vdSelectOps.length; i++){
+					if(vdSelectOps[i].value != "toSelect"){
+						var vdidFcid = vdSelectOps[i].value.split('@');
+						if(vdidFcid[1] == e.target.name){
+							vdSelect.removeChild(vdSelectOps[i]); // this remove the variable as well???
+							i -= 1;                               // which is why I have this...
+						}
+					}
+				}
+				var vdTags = vdDiv.getElementsByTagName("button");
+				for(var i = 0; i < vdTags.length; i++){
+					var vdidFcid = vdTags[i].name.split('@');
+					if(vdidFcid[1] == e.target.name){
+						var vind = advancedOptions["vendors"].indexOf(vdTags[i].name);
+						if(vind !== -1) advancedOptions["vendors"].splice(vind, 1);
+						vdDiv.removeChild(vdTags[i]);
+						i -= 1;                                   // same as before. will check this out asap
+					}
+				}
 			}
 			else{
 				if(e.target.classList.contains("darkBlueBg")){
 					var ind = advancedOptions["vendors"].indexOf(e.target.name);
 					if(ind !== -1) advancedOptions["vendors"].splice(ind, 1);
 				}
-			}
-			var tagParent = e.target.parentElement;
-			tagParent.removeChild(e.target);
-			if(tagParent.getElementsByTagName("button").length === 0){
-				document.getElementById("selectFc").selectedIndex = 0;
+				if(tagParent.getElementsByTagName("button").length === 0){
+					document.getElementById("selectVd").selectedIndex = 0;
+				}
 			}
 		}
 
 		stuDbRef.once('value').then((snapshot)=>{
-			var students = snapshot.val();
+			students = snapshot.val();
 			var currentDay = new Date();
 			var currentWeek = getWeek(currentDay);
 			var signUpData = {};
@@ -302,59 +376,78 @@
 
 		// Draw the graphs according to specified options
 		function drawGraph(){
-			var fromDate = new Date(inputs[0]);
-			var toDate = new Date(inputs[1]);
+			var fromDate = new Date(inputs[0].value);
+			var toDate = new Date(inputs[1].value);
 			var userChkBox = inputs[2];
 			var gsChkBox = inputs[3];
 			var rsChkBox = inputs[4];
-			var rsSelect = document.getElementById("selectFc");
+			var fcSelect = document.getElementById("selectFc");
+			var vdSelect = document.getElementById("selectVd");
+			var graph1 = document.getElementById("customGraph");
+			Plotly.purge(graph1);
+			graph1.innerHTML = "";
 			
 			// Initial checks
-			if(rsChkBox.checked){
-				if(rsSelect.selectedIndex == 0){
-					alert("Select a foodcourt to analyze redeemed stickers");
-					return;
+			if(!inputs[5].checked){
+				alert("Select which you want to sort by");
+				return;
+			}
+			// Populate advancedOptions if any selected "All"
+			if(rsChkBox.checked || gsChkBox.checked){
+				var vdSelectOps = vdSelect.children;
+				if(fcSelect.selectedIndex === 0){
+					if(advancedOptions["foodcourts"].length === 0){
+						for(var foodcourt in foodcourts){
+							advancedOptions["foodcourts"].push(foodcourts[foodcourt]["id"]);
+						}
+						for(var vendor in vendors){
+							advancedOptions["vendors"].push(vendors[vendor]['id'] + '@' + vendors[vendor]['foodCourtId']); 
+							advancedOptions["vendorsFull"].push(vendors[vendor]['id'] + '@' + vendors[vendor]['foodCourtId']); // in a format vdid@fcid
+						}
+					}
+				}
+				else{ 
+					if(vdSelect.selectedIndex === 0){
+						if(advancedOptions["vendors"].length === 0){
+							for(var i = 1; i < vdSelectOps.length; i++){
+								advancedOptions["vendors"].push(vdSelectOps[i].value); 
+								advancedOptions["vendorsFull"].push(vdSelectOps[i].value);// in a format vdid@fcid
+							}
+						}
+					}
+					else{
+						if(advancedOptions["vendorsFull"].length === 0){
+							for(var i = 1; i < vdSelectOps.length; i++){
+								advancedOptions["vendorsFull"].push(vdSelectOps[i].value); // in a format vdid@fcid
+							}
+						}
+					}
 				}
 			}
+			// Check if date is the right order
 			if(fromDate < toDate){
 
 			}
 			else{
-				alert("From Date must be smaller!");
+				alert("Check date duration!");
 				return;
 			}
 
 			// Preparing data
 			var data = [];
-			var trace = new Object();
-			trace['x'] = [];
-			trace['y'] = [];
-			trace['mode'] = 'lines';
-			var interDate = fromDate;
-			while(interDate <= toDate){
-				trace['x'].push(yyyymmdd(interDate));
-				interDate = new Date(interDate.getTime() + 60*60*24*1000);
-			}
-			var trace2 = trace;
-			var trace3 = trace;
 
 			// Pushing user base statistics according to date duration
 			if(userChkBox.checked){
-				stuDbRef.once('value').then((snapshot)=>{
-					var students = snapshot.val();
-					for(var i = 0; i< trace['x'].length; i++){
-						trace['y'].push(0);
+				var trace = new Trace(fromDate, toDate, 'line');
+				for(var student in students){
+					var dateOfSignUp = students[student]['signUpDate'];
+					var jsDateOfSignUp = new Date(yyyymmdd(new Date(dateOfSignUp)));
+					if(jsDateOfSignUp >= fromDate && jsDateOfSignUp <= toDate){
+						trace['y'][trace['x'].indexOf(yyyymmdd(jsDateOfSignUp))] += 1;
 					}
-					for(var student in students){
-						var dateOfSignUp = students[student]['signUpDate'];
-						var jsDateOfSignUp = new Date(dateOfSignUp);
-						if(jsDateOfSignUp >= fromDate && jsDateOfSignUp <= toDate){
-							trace['y'][trace['x'].indexOf(yyyymmdd(jsDateOfSignUp))] += 1;
-						}
-					}
-					trace['name'] = "User Base";
-					data.push(trace);
-				})
+				}
+				trace['name'] = "User Base";
+				data.push(trace);
 			}
 			
 			// Pushing generated & redeemed statistics data according to date duration
@@ -362,26 +455,212 @@
 				var fcChkBox = inputs[5];
 				var vdChkBox = inputs[6];
 				var hideChkBox = inputs[7];
-				firebase.database().ref("/Sticker").once('value').then((ssnapshot)=>{
-					if(fcChkBox.checked){
-						if(vdChkBox.checked){
-							if(hideChkBox.checked){ // Showing specified foodcourts, specified vendors, hiding foodcourts
-
-							}
-							else{ // Showing specified foodcourts, specified vendors, not hiding foodcourts
-
-							}
-						}
-						else{ // Showing specified foodcourts, no vendors
-
-						}
-					}
-					else{ // Showing all foodcourts plus total amount
-
-					}
-				})
 				
+				// Grabbing full vendor (to specified foodcourts) statistics
+				for(var i = 0; i < advancedOptions["vendorsFull"].length; i++){
+					var [vdid, fcid] = advancedOptions["vendorsFull"][i].split('@');
+					if(gsChkBox.checked){
+						var trace = new Trace(fromDate, toDate, 'line');
+						for(var sticker in stickers){
+							var dateOfCreation = stickers[sticker]['createdTime'];
+							var jsDateOfCreation = new Date(yyyymmdd(new Date(dateOfCreation)));
+							if(jsDateOfCreation >= fromDate &&
+							 jsDateOfCreation <= toDate && 
+							 stickers[sticker]['vendorId'] === vdid){
+								trace['y'][trace['x'].indexOf(yyyymmdd(jsDateOfCreation))] += 1;
+							}
+						}
+						trace['id'] = vendors[vdid]['id'] + '@' + foodcourts[fcid]['id'] + "@generated";
+						trace['name'] = vendors[vdid]['name'] + '@' + foodcourts[fcid]['name'] + "@generated";
+						data.push(trace);
+					}
+					if(rsChkBox.checked){
+						var trace = new Trace(fromDate, toDate, 'line');
+						for(var sticker in stickers){
+							var dateOfCreation = stickers[sticker]['updatedTime'];
+							if(stickers[sticker]['status'] == "STICKER_REDEEMED_BY_VENDOR" ||
+							stickers[sticker]['status'] == "STICKER_REDEEMED_BY_ADMIN"){ // Might be inaccurate
+								var jsDateOfUpdate = new Date(yyyymmdd(new Date(dateOfUpdate)));
+								if(jsDateOfUpdate >= fromDate && jsDateOfUpdate <= toDate){
+									trace['y'][trace['x'].indexOf(yyyymmdd(jsDateOfUpdate))] += 1;
+								}
+							}
+						}
+						trace['id'] = vendors[vdid]['id'] + '@' + foodcourts[fcid]['id'] + "@redeemed";
+						trace['name'] = vendors[vdid]['name'] + '@' + foodcourts[fcid]['name'] + "@redeemed";
+						data.push(trace);
+					}
+				}
+				// Calculating foodcourt statistics from vendors
+				for(var i = 0; i < advancedOptions["foodcourts"].length; i++){
+					var traceG = new Trace(fromDate, toDate, 'line');
+					var traceR = new Trace(fromDate, toDate, 'line');
+					for(var j = 0; j < data.length; j++){
+						var [vdid, fcid, type] = data[j]['id'].split('@');
+						if(advancedOptions["foodcourts"][i] == fcid && type == "generated"){
+							for(var k = 0; k < data[j]['x'].length; k++){
+								traceG['y'][k] += data[j]['y'][k];
+							}
+						}
+						if(advancedOptions["foodcourts"][i] == fcid && type == "redeemed"){
+							for(var k = 0; k < data[j]['x'].length; k++){
+								traceR['y'][k] += data[j]['y'][k];
+							}
+						}
+					}
+					traceG['id'] = fcid + "@generated";
+					traceG['name'] = foodcourts[fcid]['name'] + "@generated";
+					traceR['id'] = fcid + "@redeemed";
+					traceG['name'] = foodcourts[fcid]['name'] + "@generated";
+					if(rsChkBox.checked) data.push(traceR);
+					if(gsChkBox.checked) data.push(traceG);
+				}
+				// console.log(data);
+				// Foodcourt total
+				var traceGT = new Trace(fromDate, toDate, 'line');
+				var traceRT = new Trace(fromDate, toDate, 'line');
+				for(var i = 0; i < data.length; i++){
+					var meta = data[i]['name'].split('@');
+					switch(meta.length){
+						case 1: // user case statistics
+							break;
+						case 2: // foodcourt statistics
+							if(meta[1] === "generated") {
+								for(var j = 0; j < data[i]['x'].length; j++){
+									traceGT['y'][j] += data[i]['y'][j];
+								}
+							}
+							if(meta[1] === "redeemed") {
+								for(var j = 0; j < data[i]['x'].length; j++){
+									traceRT['y'][j] += data[i]['y'][j];
+								}
+							}
+							break;
+						case 3: // vendor statistics
+							break;
+						default:
+					}
+				}
+				traceGT['name'] = "total@generated";
+				traceRT['name'] = "total@redeemed";
+
+				// Prepare data to draw
+				// Group first
+				var vendorGData = [];
+				var vendorRData = [];
+				var foodcourtGData = [];
+				var foodcourtRData = [];
+				// Final plot
+				var dataToDraw = [];
+				// console.log(data);
+				// Start sorting
+				for(var i = 0; i < data.length; i++){
+					var meta = data[i]['id'].split('@');
+					switch(meta.length){
+						case 2: // foodcourt
+							if(meta[1] === "generated" && gsChkBox.checked){
+								foodcourtGData.push(data[i]);
+								console.log("case 2 path 1");
+								// console.log(data[i]);
+							}
+							if(meta[1] === "redeemed" && rsChkBox.checked){
+								foodcourtRData.push(data[i]);
+								console.log("case 2 path 2");
+								// console.log(data[i]);
+							}
+							break;
+						case 3: // vendor
+							for(var j = 0; j < advancedOptions["vendors"].length; j++){
+								if(meta[0] === advancedOptions["vendors"][j].split('@')[0]){
+									if(meta[2] === "generated" && gsChkBox.checked){
+										vendorGData.push(data[i]);
+										console.log("case 3 path 1");
+										// console.log(data[i]);
+									}
+									if(meta[2] === "redeemed" && rsChkBox.checked){
+										vendorRData.push(data[i]);
+										console.log("case 3 path 2");
+										// console.log(data[i]);
+									}
+								}
+							}
+							break;
+						default: // user base
+							dataToDraw.push(data[i]);
+					}
+				}
+				
+				if(fcSelect.selectedIndex === 0){ // All foodcourts plus total, no vendors
+					if(rsChkBox.checked){
+						dataToDraw.push(traceRT);
+						for(var i = 0; i < foodcourtRData.length; i++){
+							dataToDraw.push(foodcourtRData[i]);
+						}
+					} 
+					if(gsChkBox.checked){
+						dataToDraw.push(traceGT);
+						for(var i = 0; i < foodcourtGData.length; i++){
+							dataToDraw.push(foodcourtGData[i]);
+						}
+					} 
+				}
+				else{
+					if(vdChkBox.checked){
+						if(rsChkBox.checked){
+							for(var i = 0; i < vendorRData.length; i++){
+								dataToDraw.push(vendorRData[i]);
+							}
+							if(!hideChkBox.checked){
+								for(var i = 0; i < foodcourtRData.length; i++){
+									dataToDraw.push(foodcourtRData[i]);
+								}
+							}
+						}
+						if(gsChkBox.checked){
+							for(var i = 0; i < vendorGData.length; i++){
+								dataToDraw.push(vendorGData[i]);
+							}
+							if(!hideChkBox.checked){
+								for(var i = 0; i < foodcourtGData.length; i++){
+									dataToDraw.push(foodcourtGData[i]);
+								}
+							}
+						}
+					}
+					else{ 
+						if(rsChkBox.checked){ // Specific foodcourts plus respective vendors;
+							for(var i = 0; i < foodcourtRData.length; i++){
+								dataToDraw.push(foodcourtRData[i]);
+							}
+							for(var i = 0; i < vendorRData.length; i++){
+								dataToDraw.push(vendorRData[i]);
+							}
+						} 
+						if(gsChkBox.checked){
+							for(var i = 0; i < foodcourtGData.length; i++){
+								dataToDraw.push(foodcourtGData[i]);
+							}
+							for(var i = 0; i < vendorGData.length; i++){
+								dataToDraw.push(vendorGData[i]);
+							}
+						} 
+					}
+				}
+
+				Plotly.plot(graph1, dataToDraw, 
+				{xaxis: {type: 'date', title: "Date"}, yaxis: {title: "Counts"},
+					margin: { t: 0 } } );
+			
 			}
+			else{
+				Plotly.plot(graph1, data, 
+				{xaxis: {type: 'date', title: "Date"}, yaxis: {title: "User Sign-ups"},
+				margin: { t: 0 } } );
+			}
+			// Clean up
+			if(vdSelect.selectedIndex === 0) advancedOptions["vendors"] = [];
+			advancedOptions["vendorsFull"] = [];
 		}
+		
 	</script>
 </html>
