@@ -7,8 +7,25 @@
         <meta name="theme-color" content="#63ab5b" />
     </head>
     <body>
+        <div id="navBar">
+            <div class="whiteText" id="navBarTitle">Save Admin Tool</div>
+            <div id="menuButtonAction">
+                <img src="resources/icons/menu_icon.png" id="menuButtonImg" onclick="menuClicked()"/>
+            </div>
+            <ul>
+                <li class="lists"><a href="signout.html" class="topLvl whiteText">Sign Out</a></li>
+                <li class="lists dropdown">
+                    <a class="whiteText topLvl active">Manage Accounts</a>
+                    <div class="dropdownContent">
+                        <a href="vendor.html">Vendor Accounts</a>
+                        <a href="admin.html">Admin Accounts</a>
+                    </div>
+                </li>
+                <li class="lists"><a href="dashboard.html" class="topLvl whiteText">Dashboard</a></li>
+            </ul>
+        </div>
         <div style="margin: 5em auto; width: 20em; height: 13em; padding: 1em 1em; background-color: #f7efe3; border-radius: 2em">
-            <h2 style="color: #4A4A4A; margin-bottom: 1em; margin-top: 0" align="center">Admin Login</h2>
+            <h2 style="color: #4A4A4A; margin-bottom: 1em; margin-top: 0" align="center">Change Login Detail</h2>
             <input id="userName" type="text" placeholder="New Username" style="margin: 1em auto; display: block"/>
             <input id="password" type="password" placeholder="New Password" style="margin: 1em auto; display: block"/>
             <input id="passwordConfirm" type="password" placeholder="Repeat Password" style="margin: 1em auto; display: block"/>
@@ -16,9 +33,10 @@
             <div id="wrongCredential" class="redText" style="text-align: center; display: none; margin-top: 0.5em">Passwords not a match</div>
         </div>
         <div class="modal">
-            <div id="logInModal" style="position: absolute; width: 20em; height: 5em;
+            <div id="logInModal" style="position: absolute; width: 40em; height: 5em;
              background-color:honeydew; left: calc(50% - 10em); top: calc(50% - 2.5em);
              display: flex; justify-content: center; align-items: center">
+                <img src="resources/icons/treeProgress.gif" style="width: 50px;"/>
                 Changing password and logging you back in...
             </div>
         </div>

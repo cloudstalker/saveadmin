@@ -45,9 +45,9 @@
 					<h4 class="darkGrayText">Customize Your Graph</h4>
 					<div class="graphOptions">
 						<b>From:</b>&nbsp;
-						<input type="date" name="from">&nbsp;
+						<input type="date" placeholder="yyyy-mm-dd" name="from">&nbsp;
 						<b>To:</b>&nbsp;
-						<input type="date" name="to">
+						<input type="date" placeholder="yyyy-mm-dd" name="to">
 					</div>
 					<div class="graphOptions">
 						<b>Analyze:</b>&nbsp;
@@ -140,16 +140,15 @@
 		});
 		fcDbRef.once('value').then((snapshot)=>{
 			foodcourts = snapshot.val();
+			// Update foodcourts in custom graph options
+			var selectFc = document.getElementById("selectFc");
+			for(var foodcourt in foodcourts){
+				var selectOption = document.createElement('option');
+				selectOption.value = foodcourt;
+				selectOption.innerHTML = foodcourts[foodcourt]['name'];
+				selectFc.appendChild(selectOption);
+			}
 		})
-
-		// Update foodcourts in custom graph options
-		var selectFc = document.getElementById("selectFc");
-		for(var foodcourt in foodcourts){
-			var selectOption = document.createElement('option');
-			selectOption.value = foodcourt;
-			selectOption.innerHTML = foodcourts[foodcourt]['name'];
-			selectFc.appendChild(selectOption);
-		}
 
 		// Add a foodcourt into the dataset. Does not include "All".
 		function fcSelected(){
@@ -304,11 +303,15 @@
 			modal.style.display = "block";
 		}
 
-		window.onclick = function(event){
+		// Close modal
+		function exitModal(event){
 			if (event.target == modal) {
 				modal.style.display = "none";
 			}
 		}
+		window.addEventListener('click', exitModal, false);
+		window.addEventListener('touchstart', exitModal,false);
+
 
 		// Visual change when there is at least one selected checkbox. Event fires when a checkbox changed state. 
 		// Different from vendor.html
